@@ -1331,89 +1331,102 @@ public struct MenuBarPopoverView: View {
         .liquidGlassCard(cornerRadius: 14)
     }
     
+    // MARK: - Video Drop Zone Subviews
+    private var videoDropZoneIcon: some View {
+        ZStack {
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [Color.black.opacity(0.12), Color.clear],
+                        center: .center,
+                        startRadius: 5,
+                        endRadius: 32
+                    )
+                )
+                .frame(width: 52, height: 52)
+            
+            Circle()
+                .fill(
+                    colorScheme == .dark
+                    ? Color.white.opacity(0.1)
+                    : Color.black.opacity(0.06)
+                )
+                .frame(width: 40, height: 40)
+                .overlay(
+                    Circle().stroke(
+                        colorScheme == .dark
+                        ? Color.white.opacity(0.2)
+                        : Color.black.opacity(0.15),
+                        lineWidth: 1
+                    )
+                )
+            
+            Image(systemName: "film.fill")
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundColor(AppColors.brandOrange)
+        }
+    }
+    
+    private var videoDropZonePill: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "plus.circle.fill")
+                .font(.system(size: 11))
+            Text("Choose Video File...")
+                .font(.system(size: 11, weight: .bold))
+        }
+        .foregroundColor(.white)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 6)
+        .background(AppColors.primaryGradient)
+        .clipShape(Capsule())
+        .overlay(Capsule().stroke(Color.white.opacity(0.35), lineWidth: 0.8))
+        .shadow(color: Color.black.opacity(0.3), radius: 5, y: 2)
+    }
+    
+    private var videoDropZoneContent: some View {
+        VStack(spacing: 10) {
+            videoDropZoneIcon
+            
+            VStack(spacing: 3) {
+                Text("Select Video File to Stream")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundColor(Color(NSColor.labelColor))
+                
+                Text("Direct 4K / 1080p with synchronized audio\nDrop MP4, MOV, MKV, M4V or WebM file here")
+                    .font(.system(size: 11))
+                    .foregroundColor(Color(NSColor.secondaryLabelColor))
+                    .multilineTextAlignment(.center)
+            }
+            
+            videoDropZonePill
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 20)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(
+                    isDropTargeted
+                    ? AppColors.brandBlue.opacity(0.12)
+                    : (colorScheme == .dark ? Color.white.opacity(0.04) : Color.black.opacity(0.035))
+                )
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(
+                    isDropTargeted
+                    ? AppColors.brandBlue
+                    : (colorScheme == .dark ? Color.white.opacity(0.16) : Color.black.opacity(0.15)),
+                    style: StrokeStyle(lineWidth: 1.2, dash: [5])
+                )
+        )
+    }
+    
     // MARK: - Video Drop Zone Button
     private var videoDropZoneButton: some View {
         Button(action: {
             chooseVideoFile()
         }) {
-            VStack(spacing: 10) {
-                ZStack {
-                    Circle()
-                        .fill(
-                            RadialGradient(
-                                colors: [Color.black.opacity(0.12), Color.clear],
-                                center: .center,
-                                startRadius: 5,
-                                endRadius: 32
-                            )
-                        )
-                        .frame(width: 52, height: 52)
-                    
-                    Circle()
-                        .fill(
-                            colorScheme == .dark
-                            ? Color.white.opacity(0.1)
-                            : Color.black.opacity(0.06)
-                        )
-                        .frame(width: 40, height: 40)
-                        .overlay(
-                            Circle().stroke(
-                                colorScheme == .dark
-                                ? Color.white.opacity(0.2)
-                                : Color.black.opacity(0.15),
-                                lineWidth: 1
-                            )
-                        )
-                    
-                    Image(systemName: "film.fill")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundColor(AppColors.brandOrange)
-                }
-                
-                VStack(spacing: 3) {
-                    Text("Select Video File to Stream")
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundColor(Color(NSColor.labelColor))
-                    
-                    Text("Direct 4K / 1080p with synchronized audio\nDrop MP4, MOV, MKV, M4V or WebM file here")
-                        .font(.system(size: 11))
-                        .foregroundColor(Color(NSColor.secondaryLabelColor))
-                        .multilineTextAlignment(.center)
-                }
-                
-                HStack(spacing: 6) {
-                    Image(systemName: "plus.circle.fill")
-                        .font(.system(size: 11))
-                    Text("Choose Video File...")
-                        .font(.system(size: 11, weight: .bold))
-                }
-                .foregroundColor(.white)
-                .padding(.horizontal, 14)
-                .padding(.vertical, 6)
-                .background(AppColors.primaryGradient)
-                .clipShape(Capsule())
-                .overlay(Capsule().stroke(Color.white.opacity(0.35), lineWidth: 0.8))
-                .shadow(color: Color.black.opacity(0.3), radius: 5, y: 2)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 20)
-            .background(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(
-                        isDropTargeted
-                        ? AppColors.brandBlue.opacity(0.12)
-                        : (colorScheme == .dark ? Color.white.opacity(0.04) : Color.black.opacity(0.035))
-                    )
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .stroke(
-                        isDropTargeted
-                        ? AppColors.brandBlue
-                        : (colorScheme == .dark ? Color.white.opacity(0.16) : Color.black.opacity(0.15)),
-                        style: StrokeStyle(lineWidth: 1.2, dash: [5])
-                    )
-            )
+            videoDropZoneContent
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)

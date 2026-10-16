@@ -62,14 +62,30 @@ public struct WelcomeView: View {
     
     public var body: some View {
         ZStack {
-            // High-contrast Liquid Glass Background with opaque backing
+            backgroundLayer
+            
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(spacing: 16) {
+                    headerSection
+                    stepsSection
+                    menuBarSpotlightSection
+                    actionButton
+                    communitySupportButton
+                }
+            }
+        }
+        .frame(minWidth: 500, idealWidth: 540, maxWidth: .infinity, minHeight: 610, idealHeight: 650, maxHeight: .infinity)
+    }
+    
+    // MARK: - Subviews
+    private var backgroundLayer: some View {
+        ZStack {
             VisualEffectView(material: .hudWindow, blendingMode: .withinWindow)
                 .ignoresSafeArea()
             (colorScheme == .dark ? AppColors.brandDark : Color(NSColor.windowBackgroundColor))
                 .opacity(colorScheme == .dark ? 0.95 : 0.96)
                 .ignoresSafeArea()
             
-            // Subtle specular edge highlight
             RoundedRectangle(cornerRadius: 24)
                 .stroke(
                     colorScheme == .dark
@@ -86,200 +102,200 @@ public struct WelcomeView: View {
                     lineWidth: 1
                 )
                 .padding(1)
+        }
+    }
+    
+    private var headerSection: some View {
+        VStack(spacing: 10) {
+            AppLogoView(size: 76, hasShadow: true)
+                .accessibilityHidden(true)
             
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: 16) {
-                    // App Icon & Header
-                    VStack(spacing: 10) {
-                        AppLogoView(size: 76, hasShadow: true)
-                            .accessibilityHidden(true)
-                        
-                        VStack(spacing: 4) {
-                            Text("Welcome to ezku.link")
-                                .font(.system(size: 22, weight: .bold, design: .rounded))
-                                .foregroundColor(Color(NSColor.labelColor))
-                            
-                            Text("High-performance Screen Mirroring & 4K Video Streaming")
-                                .font(.system(size: 13, weight: .medium))
-                                .foregroundColor(Color(NSColor.secondaryLabelColor))
-                                .multilineTextAlignment(.center)
-                        }
-                    }
-                    .padding(.top, 20)
-                    .accessibilityElement(children: .combine)
-                    
-                    // How to Use - Step-by-Step Guide
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            Text("HOW TO USE ezku.link")
-                                .font(.system(size: 11, weight: .bold))
-                                .foregroundColor(Color(NSColor.secondaryLabelColor))
-                                .tracking(0.8)
-                            
-                            Spacer()
-                            
-                            Text("3 Simple Steps")
-                                .font(.system(size: 11, weight: .semibold))
-                                .foregroundColor(Color(NSColor.tertiaryLabelColor))
-                        }
-                        .padding(.horizontal, 4)
-                        
-                        VStack(spacing: 8) {
-                            instructionStepRow(
-                                stepNumber: "1",
-                                icon: MenuBarController.currentToolbarSymbolName(),
-                                title: "Find the Icon in Your Top Menu Bar",
-                                description: "ezku.link sits in your top macOS menu bar as the standard casting icon. Click it at any time to open casting controls."
-                            )
-                            
-                            instructionStepRow(
-                                stepNumber: "2",
-                                icon: "square.2.layers.3d",
-                                title: "Select Mode: Mirror, Extend to TV, or Video",
-                                description: "Mirror your Mac, use your TV as an extended 2nd desktop monitor at 60 FPS, or switch to Video Cast for 4K movies."
-                            )
-                            
-                            instructionStepRow(
-                                stepNumber: "3",
-                                icon: "tv.badge.wifi",
-                                title: "Stream to Smart TV or Web Browser",
-                                description: "Click \"Mirror to TV\" for Chromecast, Google TV, or DLNA (Samsung, LG). Or scan the QR code to watch on iPhone, iPad, or PC."
-                            )
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                    
-                    // Menu Bar Visual Spotlight
-                    HStack(spacing: 10) {
-                        Image(systemName: "arrow.up.circle.fill")
-                            .font(.system(size: 16))
-                            .foregroundColor(Color(NSColor.labelColor))
-                        
-                        Text("The menu bar icon is active and ready in your top-right toolbar.")
-                            .font(.system(size: 11.5, weight: .medium))
-                            .foregroundColor(Color(NSColor.secondaryLabelColor))
-                        
-                        Spacer()
-                        
-                        HStack(spacing: 5) {
-                            Image(systemName: MenuBarController.currentToolbarSymbolName())
-                                .font(.system(size: 12, weight: .semibold))
-                            Text("ezku.link")
-                                .font(.system(size: 11, weight: .bold))
-                        }
-                        .foregroundColor(Color(NSColor.labelColor))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(
-                            colorScheme == .dark
-                            ? Color.white.opacity(0.12)
-                            : Color.black.opacity(0.06)
-                        )
-                        .clipShape(Capsule())
-                        .overlay(
-                            Capsule().stroke(
-                                colorScheme == .dark
-                                ? Color.white.opacity(0.2)
-                                : Color.black.opacity(0.12),
-                                lineWidth: 1
-                            )
-                        )
-                    }
-                    .padding(10)
-                    .background(
-                        colorScheme == .dark
-                        ? Color.white.opacity(0.04)
-                        : Color.black.opacity(0.035)
-                    )
-                    .cornerRadius(12)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(
-                                colorScheme == .dark
-                                ? Color.white.opacity(0.08)
-                                : Color.black.opacity(0.08),
-                                lineWidth: 1
-                            )
-                    )
-                    .padding(.horizontal, 20)
-                    .accessibilityElement(children: .combine)
-                    
-                    // Hero Action Button
-                    Button(action: onGetStarted) {
-                        HStack(spacing: 8) {
-                            Text("Open ezku.link")
-                                .font(.system(size: 13.5, weight: .bold))
-                            Image(systemName: "arrow.right")
-                                .font(.system(size: 12, weight: .bold))
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 40)
-                        .background(
-                            LinearGradient(
-                                colors: [Color(white: 0.22), Color.black],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .foregroundColor(.white)
-                        .clipShape(Capsule())
-                        .overlay(
-                            Capsule().stroke(Color.white.opacity(0.35), lineWidth: 1)
-                        )
-                        .shadow(color: Color.black.opacity(0.35), radius: isHoveringButton ? 10 : 6, y: 3)
-                        .scaleEffect(isHoveringButton ? 1.01 : 1.0)
-                    }
-                    .buttonStyle(.plain)
-                    .onHover { isHoveringButton = $0 }
-                    .padding(.horizontal, 20)
-                    .accessibilityLabel("Open ezku.link menu bar casting controls")
-                    
-                    // Buy Me a Coffee Community Support Link
-                    Button(action: {
-                        if let url = URL(string: "https://www.buymeacoffee.com/rin2") {
-                            NSWorkspace.shared.open(url)
-                        }
-                    }) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "cup.and.saucer.fill")
-                                .font(.system(size: 12))
-                                .foregroundColor(AppColors.brandOrange)
-                            
-                            Text("Support ezku.link:")
-                                .font(.system(size: 11.5, weight: .medium))
-                                .foregroundColor(Color(NSColor.secondaryLabelColor))
-                            
-                            Text("Buy Me a Coffee")
-                                .font(.system(size: 11.5, weight: .semibold))
-                                .foregroundColor(AppColors.brandOrange)
-                            
-                            Image(systemName: "arrow.up.right")
-                                .font(.system(size: 9.5, weight: .bold))
-                                .foregroundColor(AppColors.brandOrange.opacity(0.85))
-                        }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(
-                            Capsule()
-                                .fill(colorScheme == .dark ? Color.white.opacity(0.06) : Color.black.opacity(0.04))
-                        )
-                        .overlay(
-                            Capsule()
-                                .stroke(
-                                    colorScheme == .dark ? Color.white.opacity(0.12) : Color.black.opacity(0.08),
-                                    lineWidth: 0.8
-                                )
-                        )
-                    }
-                    .buttonStyle(.plain)
-                    .padding(.top, 2)
-                    .padding(.bottom, 16)
-                    .help("Support development: Buy Me a Coffee (buymeacoffee.com/rin2)")
-                    .accessibilityLabel("Support development on Buy Me a Coffee")
-                }
+            VStack(spacing: 4) {
+                Text("Welcome to ezku.link")
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .foregroundColor(Color(NSColor.labelColor))
+                
+                Text("High-performance Screen Mirroring & 4K Video Streaming")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(Color(NSColor.secondaryLabelColor))
+                    .multilineTextAlignment(.center)
             }
         }
-        .frame(minWidth: 500, idealWidth: 540, maxWidth: .infinity, minHeight: 610, idealHeight: 650, maxHeight: .infinity)
+        .padding(.top, 20)
+        .accessibilityElement(children: .combine)
+    }
+    
+    private var stepsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("HOW TO USE ezku.link")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(Color(NSColor.secondaryLabelColor))
+                    .tracking(0.8)
+                
+                Spacer()
+                
+                Text("3 Simple Steps")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(Color(NSColor.tertiaryLabelColor))
+            }
+            .padding(.horizontal, 4)
+            
+            VStack(spacing: 8) {
+                instructionStepRow(
+                    stepNumber: "1",
+                    icon: MenuBarController.currentToolbarSymbolName(),
+                    title: "Find the Icon in Your Top Menu Bar",
+                    description: "ezku.link sits in your top macOS menu bar as the standard casting icon. Click it at any time to open casting controls."
+                )
+                
+                instructionStepRow(
+                    stepNumber: "2",
+                    icon: "square.2.layers.3d",
+                    title: "Select Mode: Mirror, Extend to TV, or Video",
+                    description: "Mirror your Mac, use your TV as an extended 2nd desktop monitor at 60 FPS, or switch to Video Cast for 4K movies."
+                )
+                
+                instructionStepRow(
+                    stepNumber: "3",
+                    icon: "tv.badge.wifi",
+                    title: "Stream to Smart TV or Web Browser",
+                    description: "Click \"Mirror to TV\" for Chromecast, Google TV, or DLNA (Samsung, LG). Or scan the QR code to watch on iPhone, iPad, or PC."
+                )
+            }
+        }
+        .padding(.horizontal, 20)
+    }
+    
+    private var menuBarSpotlightSection: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "arrow.up.circle.fill")
+                .font(.system(size: 16))
+                .foregroundColor(Color(NSColor.labelColor))
+            
+            Text("The menu bar icon is active and ready in your top-right toolbar.")
+                .font(.system(size: 11.5, weight: .medium))
+                .foregroundColor(Color(NSColor.secondaryLabelColor))
+            
+            Spacer()
+            
+            HStack(spacing: 5) {
+                Image(systemName: MenuBarController.currentToolbarSymbolName())
+                    .font(.system(size: 12, weight: .semibold))
+                Text("ezku.link")
+                    .font(.system(size: 11, weight: .bold))
+            }
+            .foregroundColor(Color(NSColor.labelColor))
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(
+                colorScheme == .dark
+                ? Color.white.opacity(0.12)
+                : Color.black.opacity(0.06)
+            )
+            .clipShape(Capsule())
+            .overlay(
+                Capsule().stroke(
+                    colorScheme == .dark
+                    ? Color.white.opacity(0.2)
+                    : Color.black.opacity(0.12),
+                    lineWidth: 1
+                )
+            )
+        }
+        .padding(10)
+        .background(
+            colorScheme == .dark
+            ? Color.white.opacity(0.04)
+            : Color.black.opacity(0.035)
+        )
+        .cornerRadius(12)
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(
+                    colorScheme == .dark
+                    ? Color.white.opacity(0.08)
+                    : Color.black.opacity(0.08),
+                    lineWidth: 1
+                )
+        )
+        .padding(.horizontal, 20)
+        .accessibilityElement(children: .combine)
+    }
+    
+    private var actionButton: some View {
+        Button(action: onGetStarted) {
+            HStack(spacing: 8) {
+                Text("Open ezku.link")
+                    .font(.system(size: 13.5, weight: .bold))
+                Image(systemName: "arrow.right")
+                    .font(.system(size: 12, weight: .bold))
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 40)
+            .background(
+                LinearGradient(
+                    colors: [Color(white: 0.22), Color.black],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .foregroundColor(.white)
+            .clipShape(Capsule())
+            .overlay(
+                Capsule().stroke(Color.white.opacity(0.35), lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.35), radius: isHoveringButton ? 10 : 6, y: 3)
+            .scaleEffect(isHoveringButton ? 1.01 : 1.0)
+        }
+        .buttonStyle(.plain)
+        .onHover { isHoveringButton = $0 }
+        .padding(.horizontal, 20)
+        .accessibilityLabel("Open ezku.link menu bar casting controls")
+    }
+    
+    private var communitySupportButton: some View {
+        Button(action: {
+            if let url = URL(string: "https://www.buymeacoffee.com/rin2") {
+                NSWorkspace.shared.open(url)
+            }
+        }) {
+            HStack(spacing: 6) {
+                Image(systemName: "cup.and.saucer.fill")
+                    .font(.system(size: 12))
+                    .foregroundColor(AppColors.brandOrange)
+                
+                Text("Support ezku.link:")
+                    .font(.system(size: 11.5, weight: .medium))
+                    .foregroundColor(Color(NSColor.secondaryLabelColor))
+                
+                Text("Buy Me a Coffee")
+                    .font(.system(size: 11.5, weight: .semibold))
+                    .foregroundColor(AppColors.brandOrange)
+                
+                Image(systemName: "arrow.up.right")
+                    .font(.system(size: 9.5, weight: .bold))
+                    .foregroundColor(AppColors.brandOrange.opacity(0.85))
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(
+                Capsule()
+                    .fill(colorScheme == .dark ? Color.white.opacity(0.06) : Color.black.opacity(0.04))
+            )
+            .overlay(
+                Capsule()
+                    .stroke(
+                        colorScheme == .dark ? Color.white.opacity(0.12) : Color.black.opacity(0.08),
+                        lineWidth: 0.8
+                    )
+            )
+        }
+        .buttonStyle(.plain)
+        .padding(.top, 2)
+        .padding(.bottom, 16)
+        .help("Support development: Buy Me a Coffee (buymeacoffee.com/rin2)")
+        .accessibilityLabel("Support development on Buy Me a Coffee")
     }
     
     private func instructionStepRow(stepNumber: String, icon: String, title: String, description: String) -> some View {
