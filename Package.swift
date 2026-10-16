@@ -17,5 +17,5 @@ let package = Package(
             dependencies: ["EzkuLink"]
         ),
     ],
-    swiftLanguageModes: [.v6]
+    swiftLanguageModes: [.v5]
 )

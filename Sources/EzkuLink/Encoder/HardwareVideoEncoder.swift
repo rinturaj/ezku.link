@@ -1,7 +1,7 @@
 import Foundation
 import CoreMedia
 import CoreVideo
-import CoreImage
+@preconcurrency import CoreImage
 import Metal
 
 public protocol HardwareVideoEncoderDelegate: AnyObject, Sendable {

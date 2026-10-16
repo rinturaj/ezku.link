@@ -9,8 +9,9 @@ public struct VideoPlaybackHUDView: View {
     @State private var isDraggingSeek = false
     @State private var localSeekValue = 0.0
     
-    public init(coordinator: CastingCoordinator = .shared, meta: VideoMetadata) {
-        self.coordinator = coordinator
+    @MainActor
+    public init(coordinator: CastingCoordinator? = nil, meta: VideoMetadata) {
+        self.coordinator = coordinator ?? .shared
         self.meta = meta
     }
     
