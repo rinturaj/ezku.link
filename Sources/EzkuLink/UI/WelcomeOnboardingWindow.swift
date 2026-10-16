@@ -17,12 +17,12 @@ public final class WelcomeOnboardingWindow: NSObject {
         }
         
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 540, height: 630),
+            contentRect: NSRect(x: 0, y: 0, width: 540, height: 650),
             styleMask: [.titled, .closable, .resizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
-        window.minSize = NSSize(width: 480, height: 560)
+        window.minSize = NSSize(width: 480, height: 580)
         window.center()
         window.isReleasedWhenClosed = false
         window.titlebarAppearsTransparent = true
@@ -232,12 +232,54 @@ public struct WelcomeView: View {
                     .buttonStyle(.plain)
                     .onHover { isHoveringButton = $0 }
                     .padding(.horizontal, 20)
-                    .padding(.bottom, 20)
                     .accessibilityLabel("Open ezku.link menu bar casting controls")
+                    
+                    // Buy Me a Coffee Community Support Link
+                    Button(action: {
+                        if let url = URL(string: "https://www.buymeacoffee.com/rin2") {
+                            NSWorkspace.shared.open(url)
+                        }
+                    }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "cup.and.saucer.fill")
+                                .font(.system(size: 12))
+                                .foregroundColor(AppColors.brandOrange)
+                            
+                            Text("Support ezku.link:")
+                                .font(.system(size: 11.5, weight: .medium))
+                                .foregroundColor(Color(NSColor.secondaryLabelColor))
+                            
+                            Text("Buy Me a Coffee")
+                                .font(.system(size: 11.5, weight: .semibold))
+                                .foregroundColor(AppColors.brandOrange)
+                            
+                            Image(systemName: "arrow.up.right")
+                                .font(.system(size: 9.5, weight: .bold))
+                                .foregroundColor(AppColors.brandOrange.opacity(0.85))
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(
+                            Capsule()
+                                .fill(colorScheme == .dark ? Color.white.opacity(0.06) : Color.black.opacity(0.04))
+                        )
+                        .overlay(
+                            Capsule()
+                                .stroke(
+                                    colorScheme == .dark ? Color.white.opacity(0.12) : Color.black.opacity(0.08),
+                                    lineWidth: 0.8
+                                )
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.top, 2)
+                    .padding(.bottom, 16)
+                    .help("Support development: Buy Me a Coffee (buymeacoffee.com/rin2)")
+                    .accessibilityLabel("Support development on Buy Me a Coffee")
                 }
             }
         }
-        .frame(minWidth: 500, idealWidth: 540, maxWidth: .infinity, minHeight: 600, idealHeight: 630, maxHeight: .infinity)
+        .frame(minWidth: 500, idealWidth: 540, maxWidth: .infinity, minHeight: 610, idealHeight: 650, maxHeight: .infinity)
     }
     
     private func instructionStepRow(stepNumber: String, icon: String, title: String, description: String) -> some View {

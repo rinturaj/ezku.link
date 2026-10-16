@@ -131,7 +131,7 @@ public struct FooterHoverButtonStyle: ButtonStyle {
     
     public func makeBody(configuration: Configuration) -> some View {
         configuration.label
-            .padding(.horizontal, 6)
+            .padding(.horizontal, 5)
             .padding(.vertical, 3)
             .background(
                 RoundedRectangle(cornerRadius: 6, style: .continuous)
@@ -141,6 +141,7 @@ public struct FooterHoverButtonStyle: ButtonStyle {
                         : Color.clear
                     )
             )
+            .opacity(configuration.isPressed ? 0.7 : 1.0)
             .contentShape(Rectangle())
             .onHover { isHovered = $0 }
     }

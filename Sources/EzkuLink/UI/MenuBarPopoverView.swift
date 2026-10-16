@@ -74,10 +74,10 @@ public struct MenuBarPopoverView: View {
             
             // Streamlined macOS-style Footer
             footerView
-                .padding(.horizontal, 16)
-                .padding(.vertical, 9)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 8)
         }
-        .frame(minWidth: 380, idealWidth: 388, maxWidth: 440)
+        .frame(minWidth: 388, idealWidth: 392, maxWidth: 440)
         .background(
             ZStack {
                 VisualEffectView(material: .popover, blendingMode: .withinWindow)
@@ -1736,101 +1736,140 @@ public struct MenuBarPopoverView: View {
     
     // MARK: - Streamlined macOS-style Footer
     private var footerView: some View {
-        HStack(spacing: 8) {
-            // Left: Open in Browser
-            Button(action: {
-                let targetURL = coordinator.castingMode == .videoFile ? coordinator.videoWebURL : coordinator.localURL
-                if let url = URL(string: targetURL) {
-                    NSWorkspace.shared.open(url)
+        HStack(spacing: 0) {
+            // Left Group: Browser & Community Links
+            HStack(spacing: 4) {
+                // Web Player
+                Button(action: {
+                    let targetURL = coordinator.castingMode == .videoFile ? coordinator.videoWebURL : coordinator.localURL
+                    if let url = URL(string: targetURL) {
+                        NSWorkspace.shared.open(url)
+                    }
+                }) {
+                    HStack(spacing: 3.5) {
+                        Image(systemName: "safari")
+                            .font(.system(size: 11, weight: .medium))
+                        Text("Web Player")
+                            .font(.system(size: 11, weight: .medium))
+                            .lineLimit(1)
+                    }
+                    .fixedSize()
                 }
-            }) {
-                HStack(spacing: 4) {
-                    Image(systemName: "safari")
-                        .font(.system(size: 11))
-                    Text("Web Player")
-                        .font(.system(size: 11, weight: .medium))
+                .buttonStyle(FooterHoverButtonStyle())
+                .foregroundColor(AppColors.secondaryText)
+                .help("Open Web Player in your default browser")
+                .accessibilityLabel("Open Web Player in default browser")
+                
+                // Buy Me a Coffee
+                Button(action: {
+                    if let url = URL(string: "https://www.buymeacoffee.com/rin2") {
+                        NSWorkspace.shared.open(url)
+                    }
+                }) {
+                    HStack(spacing: 3.5) {
+                        Image(systemName: "cup.and.saucer.fill")
+                            .font(.system(size: 10.5))
+                            .foregroundColor(AppColors.brandOrange)
+                        Text("Coffee")
+                            .font(.system(size: 11, weight: .medium))
+                            .lineLimit(1)
+                    }
+                    .fixedSize()
                 }
+                .buttonStyle(FooterHoverButtonStyle())
+                .foregroundColor(AppColors.secondaryText)
+                .help("Support development: Buy Me a Coffee (buymeacoffee.com/rin2)")
+                .accessibilityLabel("Support development on Buy Me a Coffee")
             }
-            .buttonStyle(FooterHoverButtonStyle())
-            .foregroundColor(AppColors.secondaryText)
-            .help("Open Web Player in your default browser")
-            .accessibilityLabel("Open Web Player in default browser")
+            .layoutPriority(1)
             
-            // Guide shortcut
-            Button(action: {
-                WelcomeOnboardingWindow.show()
-            }) {
-                HStack(spacing: 3) {
-                    Image(systemName: "questionmark.circle")
-                        .font(.system(size: 11))
-                    Text("Guide")
-                        .font(.system(size: 11, weight: .medium))
+            Spacer(minLength: 12)
+            
+            // Right Group: Guide, Icon Style, and Quit
+            HStack(spacing: 4) {
+                // Guide
+                Button(action: {
+                    WelcomeOnboardingWindow.show()
+                }) {
+                    HStack(spacing: 3) {
+                        Image(systemName: "questionmark.circle")
+                            .font(.system(size: 11, weight: .medium))
+                        Text("Guide")
+                            .font(.system(size: 11, weight: .medium))
+                            .lineLimit(1)
+                    }
+                    .fixedSize()
                 }
-            }
-            .buttonStyle(FooterHoverButtonStyle())
-            .foregroundColor(AppColors.secondaryText)
-            .help("Show Welcome & How-to-Use Guide")
-            .accessibilityLabel("Open Welcome and How-to-Use Guide")
-            
-            Spacer()
-            
-            // Toolbar Icon Style selector menu
-            Menu {
-                ForEach(ToolbarIconStyle.allCases) { style in
-                    Button(action: {
-                        MenuBarController.toolbarIconStyle = style
-                    }) {
-                        HStack {
-                            Text(style.displayName)
-                            if MenuBarController.toolbarIconStyle == style {
-                                Image(systemName: "checkmark")
+                .buttonStyle(FooterHoverButtonStyle())
+                .foregroundColor(AppColors.secondaryText)
+                .help("Show Welcome & How-to-Use Guide")
+                .accessibilityLabel("Open Welcome and How-to-Use Guide")
+                
+                // Toolbar Icon Style selector menu
+                Menu {
+                    ForEach(ToolbarIconStyle.allCases) { style in
+                        Button(action: {
+                            MenuBarController.toolbarIconStyle = style
+                        }) {
+                            HStack {
+                                Text(style.displayName)
+                                if MenuBarController.toolbarIconStyle == style {
+                                    Image(systemName: "checkmark")
+                                }
                             }
                         }
                     }
+                } label: {
+                    HStack(spacing: 2.5) {
+                        Image(systemName: MenuBarController.currentToolbarSymbolName())
+                            .font(.system(size: 11))
+                        Text("Icon")
+                            .font(.system(size: 11, weight: .medium))
+                            .lineLimit(1)
+                    }
+                    .fixedSize()
                 }
-            } label: {
-                HStack(spacing: 3) {
-                    Image(systemName: MenuBarController.currentToolbarSymbolName())
-                        .font(.system(size: 11))
-                    Text("Icon")
-                        .font(.system(size: 11, weight: .medium))
+                .menuStyle(.borderlessButton)
+                .buttonStyle(FooterHoverButtonStyle())
+                .foregroundColor(AppColors.secondaryText)
+                .help("Select Menu Bar icon symbol")
+                .accessibilityLabel("Select Menu Bar icon symbol")
+                
+                // Native macOS Vertical Hairline Separator
+                Rectangle()
+                    .fill(colorScheme == .dark ? Color.white.opacity(0.12) : Color.black.opacity(0.1))
+                    .frame(width: 1, height: 11)
+                    .padding(.horizontal, 2)
+                    .accessibilityHidden(true)
+                
+                // Quit with standard macOS ⌘Q indicator
+                Button(action: {
+                    coordinator.stopCasting()
+                    NSApplication.shared.terminate(nil)
+                }) {
+                    HStack(spacing: 3.5) {
+                        Text("Quit")
+                            .font(.system(size: 11, weight: .medium))
+                            .lineLimit(1)
+                        Text("⌘Q")
+                            .font(.system(size: 9, weight: .semibold, design: .rounded))
+                            .foregroundColor(AppColors.tertiaryText)
+                            .padding(.horizontal, 3.5)
+                            .padding(.vertical, 1)
+                            .background(
+                                RoundedRectangle(cornerRadius: 3.5, style: .continuous)
+                                    .fill(colorScheme == .dark ? Color.white.opacity(0.08) : Color.black.opacity(0.06))
+                            )
+                    }
+                    .fixedSize()
                 }
+                .buttonStyle(FooterHoverButtonStyle())
+                .foregroundColor(AppColors.secondaryText)
+                .keyboardShortcut("q", modifiers: .command)
+                .help("Quit ezku.link (⌘Q)")
+                .accessibilityLabel("Quit ezku.link, keyboard shortcut Command Q")
             }
-            .menuStyle(.borderlessButton)
-            .buttonStyle(FooterHoverButtonStyle())
-            .foregroundColor(AppColors.secondaryText)
-            .help("Select Menu Bar icon symbol")
-            .accessibilityLabel("Select Menu Bar icon symbol")
-            
-            Text("•")
-                .font(.system(size: 9))
-                .foregroundColor(AppColors.tertiaryText)
-                .accessibilityHidden(true)
-            
-            // Quit with standard macOS ⌘Q indicator
-            Button(action: {
-                coordinator.stopCasting()
-                NSApplication.shared.terminate(nil)
-            }) {
-                HStack(spacing: 4) {
-                    Text("Quit")
-                        .font(.system(size: 11, weight: .medium))
-                    Text("⌘Q")
-                        .font(.system(size: 9.5, weight: .semibold, design: .rounded))
-                        .foregroundColor(AppColors.tertiaryText)
-                        .padding(.horizontal, 3.5)
-                        .padding(.vertical, 1)
-                        .background(
-                            RoundedRectangle(cornerRadius: 3.5, style: .continuous)
-                                .fill(colorScheme == .dark ? Color.white.opacity(0.08) : Color.black.opacity(0.06))
-                        )
-                }
-            }
-            .buttonStyle(FooterHoverButtonStyle())
-            .foregroundColor(AppColors.secondaryText)
-            .keyboardShortcut("q", modifiers: .command)
-            .help("Quit ezku.link (⌘Q)")
-            .accessibilityLabel("Quit ezku.link, keyboard shortcut Command Q")
+            .layoutPriority(1)
         }
     }
 

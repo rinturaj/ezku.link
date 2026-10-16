@@ -1,0 +1,122 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release Tag (e.g. v1.0.0, leave blank to use Info.plist version)'
+        required: false
+        default: ''
+      draft:
+        description: 'Create Draft Release'
+        type: boolean
+        required: false
+        default: false
+      prerelease:
+        description: 'Mark as Pre-release'
+        type: boolean
+        required: false
+        default: false
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build & Publish Release
+    runs-on: macos-14
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Environment Diagnostics
+        run: |
+          echo "🖥️ macOS Version: $(sw_vers -productVersion)"
+          echo "🛠️ Xcode Path:   $(xcode-select -p)"
+          echo "⚡ Swift Version: $(swift --version | head -n 1)"
+          uname -m
+
+      - name: Resolve Release Version
+        id: version
+        run: |
+          # 1. Determine tag name
+          if [ -n "${{ github.event.inputs.tag_name }}" ]; then
+            TAG="${{ github.event.inputs.tag_name }}"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            TAG="${GITHUB_REF#refs/tags/}"
+          else
+            PLIST_VER=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "Resources/Info.plist" 2>/dev/null || echo "1.0.0")
+            TAG="v$PLIST_VER"
+          fi
+
+          # Strip leading 'v' for numeric version
+          CLEAN_VER="${TAG#v}"
+          
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$CLEAN_VER" >> "$GITHUB_OUTPUT"
+          
+          echo "🏷️ Release Tag: $TAG"
+          echo "🔢 Semantic Version: $CLEAN_VER"
+          
+          # Update Info.plist with resolved version if PlistBuddy is available
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $CLEAN_VER" "Resources/Info.plist" 2>/dev/null || true
+
+      - name: Run Swift Test Suite
+        run: |
+          echo "🧪 Running unit & integration tests..."
+          swift test
+
+      - name: Compile & Package Application Bundle
+        run: |
+          echo "🔨 Building Release App Bundle..."
+          chmod +x Scripts/build_app.sh
+          ./Scripts/build_app.sh
+
+      - name: Package macOS Installer DMG
+        run: |
+          echo "💿 Creating DMG installer..."
+          chmod +x Scripts/build_dmg.sh
+          ./Scripts/build_dmg.sh
+
+      - name: Package Standalone Application ZIP
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          echo "📦 Creating ZIP archive of ezku.link.app..."
+          cd build
+          ditto -c -k --sequesterRsrc --keepParent "ezku.link.app" "ezku.link-v${VERSION}-macOS.zip"
+          cp "ezku.link-v${VERSION}-macOS.zip" "ezku.link-macOS.zip"
+          ls -lh
+
+      - name: Generate Checksums
+        run: |
+          echo "🔏 Calculating SHA256 checksums..."
+          cd build
+          shasum -a 256 *.dmg *.zip > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: "ezku.link ${{ steps.version.outputs.tag }}"
+          draft: ${{ github.event.inputs.draft || false }}
+          prerelease: ${{ github.event.inputs.prerelease || false }}
+          generate_release_notes: true
+          files: |
+            build/ezku.link.dmg
+            build/ezku.link-*.dmg
+            build/ezku.link-*.zip
+            build/SHA256SUMS.txt
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

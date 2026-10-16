@@ -5,11 +5,17 @@
 
 [![macOS 14+](https://img.shields.io/badge/macOS-14.0%2B%20(Sonoma%20%26%20Sequoia)-000000?style=for-the-badge&logo=apple&logoColor=white)](https://ezku.link)
 [![Apple Silicon](https://img.shields.io/badge/Apple%20Silicon-M1%20%2F%20M2%20%2F%20M3%20%2F%20M4-black?style=for-the-badge&logo=apple&logoColor=white)](https://ezku.link)
-[![Swift 6](https://img.shields.io/badge/Swift-6.3-F05138?style=for-the-badge&logo=swift&logoColor=white)](https://swift.org)
+[![Swift 6](https://img.shields.io/badge/Swift-6.0%2B-F05138?style=for-the-badge&logo=swift&logoColor=white)](https://swift.org)
 [![Metal Accelerated](https://img.shields.io/badge/Metal-GPU%20Accelerated-critical?style=for-the-badge&logo=metal)](https://developer.apple.com/metal/)
 [![Website](https://img.shields.io/badge/Website-ezku.link-blue?style=for-the-badge&logo=safari&logoColor=white)](https://ezku.link)
 
 **ezku.link** is a native macOS menu bar utility engineered exclusively for Apple Silicon and macOS. Designed to live silently in your top menu bar (`NSStatusItem`) with zero dock clutter (`LSUIElement`), **ezku.link** lets you broadcast your screen, app windows, or local 4K video files to any Smart TV or web browser in **1 click** with sub-30ms ultra-low latency.
+
+<br/>
+
+<img src="assets/demo.gif" alt="ezku.link in action - macOS Screen Mirroring & Smart TV Cast" width="860" style="border-radius: 12px; box-shadow: 0 12px 36px rgba(0,0,0,0.4);" />
+
+<br/>
 
 [Website](https://ezku.link) • [Features](#key-features) • [Installation](#quick-start) • [App Store Tags & Metadata](#-app-store-metadata--tags) • [Architecture](#technical-architecture)
 
@@ -130,13 +136,15 @@ screen mirror,smart tv,cast,chromecast,dlna,airplay,samsung tv,lg tv,stream,disp
 
 ```
 EzkuLink/
-├── Package.swift                  # Swift Package Manager (macOS 14+, Swift 6.3)
+├── Package.swift                  # Swift Package Manager (macOS 14+, Swift 6.0+)
 ├── Resources/
 │   ├── Info.plist                # CFBundleName = ezku.link, permissions
 │   ├── EzkuLink.entitlements     # Network server & client entitlements
 │   └── AppIcon.icns              # Multi-resolution macOS icon assets
 ├── Scripts/
-│   └── build_app.sh              # Compiles and packages into native ezku.link.app
+│   ├── build_app.sh              # Compiles and packages into native ezku.link.app
+│   ├── build_dmg.sh              # Packages signed macOS installer .dmg
+│   └── generate_dmg_background.swift # Custom DMG drag-and-drop artwork generator
 ├── Sources/EzkuLink/
 │   ├── main.swift                # App entry point
 │   ├── App/

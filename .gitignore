@@ -12,3 +12,5 @@ build
 .agents/
 skills-lock.json
 /swiftpm
+release
+*.original.gif

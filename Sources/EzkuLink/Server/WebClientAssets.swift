@@ -241,6 +241,9 @@ public enum WebClientAssets {
             <button class="btn" id="fullscreenBtn" title="Fullscreen (F)">
                 <span>⛶</span> Fullscreen
             </button>
+            <a href="https://www.buymeacoffee.com/rin2" target="_blank" rel="noopener noreferrer" class="btn" title="Support ezku.link on Buy Me a Coffee" style="text-decoration:none; color:inherit;">
+                <span style="color:#d97757;">☕</span> Coffee
+            </a>
         </div>
     </div>
 

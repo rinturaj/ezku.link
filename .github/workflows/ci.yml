@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'Sources/**'
+      - 'Tests/**'
+      - 'Package.swift'
+      - 'Scripts/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'Sources/**'
+      - 'Tests/**'
+      - 'Package.swift'
+      - 'Scripts/**'
+      - '.github/workflows/**'
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-and-build:
+    name: Test & Build
+    runs-on: macos-14
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Environment Diagnostics
+        run: |
+          echo "🖥️ macOS Version: $(sw_vers -productVersion)"
+          echo "🛠️ Xcode Path:   $(xcode-select -p)"
+          echo "⚡ Swift Version: $(swift --version | head -n 1)"
+
+      - name: Run Swift Test Suite
+        run: |
+          swift test
+
+      - name: Build Application Bundle
+        run: |
+          chmod +x Scripts/build_app.sh
+          ./Scripts/build_app.sh
+
+      - name: Verify App Bundle Structure
+        run: |
+          test -d "build/ezku.link.app"
+          test -f "build/ezku.link.app/Contents/MacOS/EzkuLink"
+          test -f "build/ezku.link.app/Contents/Info.plist"
+          codesign --verify --deep --strict "build/ezku.link.app"
+          echo "✅ Application bundle verification succeeded!"
