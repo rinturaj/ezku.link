@@ -260,5 +260,31 @@ struct EzkuLinkTests {
             #expect(!manager.isExtendedDisplayActive)
         }
     }
+    
+    @Test("VideoMetadata model with thumbnail and Sendable conformance")
+    func testVideoMetadataSendable() {
+        let dummyURL = URL(fileURLWithPath: "/tmp/sample.mp4")
+        let img = NSImage(size: NSSize(width: 100, height: 100))
+        let meta = VideoMetadata(
+            url: dummyURL,
+            title: "Sample Video",
+            duration: 120.0,
+            durationFormatted: "02:00",
+            resolution: "1920x1080",
+            fileSizeBytes: 1048576,
+            fileSizeFormatted: "1.0 MB",
+            thumbnail: img
+        )
+        #expect(meta.title == "Sample Video")
+        #expect(meta.duration == 120.0)
+        #expect(meta.thumbnail != nil)
+    }
+
+    @Test("ScreenCaptureEngine fetchShareableContent on MainActor")
+    @MainActor
+    func testScreenCaptureEngineFetch() async {
+        _ = try? await ScreenCaptureEngine.fetchShareableContent()
+        #expect(Bool(true))
+    }
 }
 

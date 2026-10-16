@@ -47,6 +47,7 @@ public final class ScreenCaptureEngine: NSObject, @unchecked Sendable {
     }
     
     /// Fetches all currently shareable displays and non-empty on-screen windows
+    @MainActor
     public static func fetchShareableContent() async throws -> (displays: [SCDisplay], windows: [SCWindow]) {
         guard CGPreflightScreenCaptureAccess() else {
             return ([], [])

@@ -2,7 +2,7 @@ import Foundation
 import AVFoundation
 import AppKit
 
-public struct VideoMetadata: Sendable, Identifiable {
+public struct VideoMetadata: @unchecked Sendable, Identifiable {
     public var id: String { url.absoluteString }
     public let url: URL
     public let title: String
