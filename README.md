@@ -17,12 +17,14 @@
 
 <br/>
 
-[Website](https://ezku.link) • [Features](#key-features) • [Installation](#quick-start) • [App Store Tags & Metadata](#-app-store-metadata--tags) • [Architecture](#technical-architecture)
+[Website](https://ezku.link) • [Features](#features) • [Installation](#installation) • [Usage Guide](#usage-guide) • [Architecture](#architecture) • [App Store Metadata](#app-store-metadata) • [Support](#support)
 
 ---
 
 </div>
 
+<a id="features"></a>
+<a id="key-features"></a>
 ## ✨ Key Features
 
 ### 📺 1. Smart TV Direct Casting (Google Cast & DLNA)
@@ -64,14 +66,26 @@
 
 ---
 
-## 🚀 Quick Start
+<a id="installation"></a>
+<a id="quick-start"></a>
+## 🚀 Installation & Quick Start
 
-### Build & Run from Source
+### Option 1: Download Pre-Built DMG (Recommended)
+
+1. Download the latest release from [GitHub Releases](https://github.com/rinturaj/ezku.link/releases/latest):
+   - **`ezku.link.dmg`**: Official macOS drag-and-drop installer.
+   - **`ezku.link-macOS.zip`**: Standalone application archive.
+2. Open `ezku.link.dmg` and drag **ezku.link** into **Applications**.
+3. Launch **ezku.link** from Spotlight or Applications.
+
+### Option 2: Build & Run from Source
+
+**Prerequisites**: macOS 14.0+ on Apple Silicon (M1/M2/M3/M4), Xcode Command Line Tools (`xcode-select --install`).
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/rinturajc/ezkuCasting.git
-cd ezkuCasting
+git clone https://github.com/rinturaj/ezku.link.git
+cd ezku.link
 
 # 2. Build the native macOS bundle
 ./Scripts/build_app.sh
@@ -83,17 +97,10 @@ cd ezkuCasting
 open "build/ezku.link.app"
 ```
 
-### Install via DMG or Applications Folder
-
-- Double-click `build/ezku.link.dmg` and drag **ezku.link** into **Applications**.
-- Or copy directly from terminal:
-```bash
-cp -R "build/ezku.link.app" /Applications/
-open "/Applications/ezku.link.app"
-```
-
 ---
 
+<a id="usage"></a>
+<a id="usage-guide"></a>
 ## 📖 Usage Guide
 
 1. **Click the Menu Bar Icon**: Click the screen cast icon in the top-right macOS menu bar to reveal the popover.
@@ -107,6 +114,9 @@ open "/Applications/ezku.link.app"
 
 ---
 
+<a id="app-store-metadata"></a>
+<a id="app-store-metadata--tags"></a>
+<a id="app-store-tags"></a>
 ## 🏷 App Store Metadata & Tags
 
 Use the following curated metadata for publishing on the **Mac App Store** or product directories:
@@ -132,7 +142,40 @@ screen mirror,smart tv,cast,chromecast,dlna,airplay,samsung tv,lg tv,stream,disp
 
 ---
 
+<a id="architecture"></a>
+<a id="technical-architecture"></a>
 ## 🏗 Technical Architecture
+
+### High-Performance Hardware Streaming Pipeline
+
+ezku.link operates fully in user space with zero kernel extensions or third-party dependencies, leveraging native Apple Silicon GPU and networking APIs:
+
+```text
+┌────────────────────────────────────────────────────────────────────────┐
+│                        macOS WindowServer                              │
+└───────────────────────────────────┬────────────────────────────────────┘
+                                    │ ScreenCaptureKit (Zero-Copy Frame Acquisition)
+                                    ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│              HardwareVideoEncoder (Metal GPU Pipeline)                 │
+│  - CIContext GPU frame processing on Apple Silicon                     │
+│  - Dynamic quality presets (Ultra 60 FPS, Retina Native, Battery Saver)│
+│  - Real-time telemetry HUD (FPS, Bitrate, Sub-3ms Encode Latency)      │
+└───────────────────┬────────────────────────────────┬───────────────────┘
+                    │                                │
+         AVTransport SOAP (DLNA)             Protobuf Socket (Cast V2)
+                    ▼                                ▼
+       ┌────────────────────────┐      ┌─────────────────────────┐
+       │ Smart TVs (Samsung, LG)│      │ Chromecast & Google TV  │
+       └────────────────────────┘      └─────────────────────────┘
+                    ▲
+                    │ HTTP Byte-Range / WebSocket (Network.framework)
+       ┌────────────┴───────────┐
+       │ Web Receivers (Canvas) │ (iPhone, iPad, PC, Android, Mac)
+       └────────────────────────┘
+```
+
+### Directory Structure
 
 ```
 EzkuLink/
@@ -150,7 +193,8 @@ EzkuLink/
 │   ├── App/
 │   │   └── AppDelegate.swift     # Accessory policy & lifecycle
 │   ├── Capture/
-│   │   └── ScreenCaptureEngine.swift # Apple ScreenCaptureKit screen & audio engine
+│   │   ├── ScreenCaptureEngine.swift # Apple ScreenCaptureKit screen & audio engine
+│   │   └── VirtualDisplayManager.swift # User-space Virtual 2nd Display Engine
 │   ├── Encoder/
 │   │   └── HardwareVideoEncoder.swift # Metal GPU acceleration & telemetry
 │   ├── Server/
@@ -163,6 +207,7 @@ EzkuLink/
 │   ├── UI/
 │   │   ├── MenuBarController.swift # NSStatusItem controller
 │   │   ├── MenuBarPopoverView.swift # SwiftUI popover UI with TV list & QR code
+│   │   ├── VisualStyles.swift     # Liquid glass cards & button styles
 │   │   └── WelcomeOnboardingWindow.swift # User onboarding & quick start guide
 │   └── Utils/
 │       ├── NetworkUtils.swift     # Local IP detection & QR generator
@@ -172,6 +217,8 @@ EzkuLink/
 
 ---
 
+<a id="support"></a>
+<a id="support--community"></a>
 ## ☕ Support & Community
 
 If you find ezku.link useful, consider supporting future development:
