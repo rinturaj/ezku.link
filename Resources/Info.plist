@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>en</string>
+    <key>CFBundleExecutable</key>
+    <string>EzkuLink</string>
+    <key>CFBundleIdentifier</key>
+    <string>link.ezku.mac</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>ezku.link</string>
+    <key>CFBundleDisplayName</key>
+    <string>ezku.link</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>CFBundleIconName</key>
+    <string>AppIcon</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>14.0</string>
+    <key>LSUIElement</key>
+    <true/>
+    <key>NSHighResolutionCapable</key>
+    <true/>
+    <key>NSScreenCaptureUsageDescription</key>
+    <string>ezku.link requires Screen Recording access to cast your display and windows with ultra-low latency.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>ezku.link requires microphone access if you choose to stream your voice along with the screen.</string>
+    <key>NSLocalNetworkUsageDescription</key>
+    <string>ezku.link connects to local smart TVs and allows devices on your Wi-Fi to watch your screen stream.</string>
+    <key>NSBonjourServices</key>
+    <array>
+        <string>_ezkulink._tcp</string>
+    </array>
+</dict>
+</plist>
