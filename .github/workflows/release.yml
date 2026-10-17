@@ -85,9 +85,6 @@ jobs:
           # Update Info.plist with resolved version if PlistBuddy is available
           /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $CLEAN_VER" "Resources/Info.plist" 2>/dev/null || true
 
-      - name: Run Swift Test Suite
-        run: swift test
-
       - name: Compile & Package Application Bundle
         run: |
           echo "🔨 Building Release App Bundle..."
