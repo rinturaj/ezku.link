@@ -11,6 +11,10 @@ build
 .impeccable
 .agents/
 skills-lock.json
-/swiftpm
 release
 *.original.gif
+*.p12
+*.cer
+*.key
+*.pem
+*.provisionprofile
