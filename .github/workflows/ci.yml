@@ -53,6 +53,9 @@ jobs:
           echo "🛠️ Xcode Path:   $(xcode-select -p)"
           echo "⚡ Swift Version: $(swift --version | head -n 1)"
 
+      - name: Run Swift Test Suite
+        run: swift test
+
       - name: Build Application Bundle
         run: |
           chmod +x Scripts/build_app.sh
