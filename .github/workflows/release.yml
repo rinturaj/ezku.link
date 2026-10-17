@@ -85,8 +85,38 @@ jobs:
           # Update Info.plist with resolved version if PlistBuddy is available
           /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $CLEAN_VER" "Resources/Info.plist" 2>/dev/null || true
 
+      - name: Validate Apple Developer Credentials
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          echo "🔐 Validating required Apple Developer credentials..."
+          MISSING=0
+          if [ -z "$MACOS_CERTIFICATE" ]; then
+            echo "❌ Error: 'MACOS_CERTIFICATE' secret is missing."
+            MISSING=1
+          fi
+          if [ -z "$APPLE_ID" ]; then
+            echo "❌ Error: 'APPLE_ID' secret is missing."
+            MISSING=1
+          fi
+          if [ -z "$APPLE_APP_SPECIFIC_PASSWORD" ]; then
+            echo "❌ Error: 'APPLE_APP_SPECIFIC_PASSWORD' secret is missing."
+            MISSING=1
+          fi
+          if [ -z "$APPLE_TEAM_ID" ]; then
+            echo "❌ Error: 'APPLE_TEAM_ID' secret is missing."
+            MISSING=1
+          fi
+          if [ "$MISSING" -eq 1 ]; then
+            echo "🚨 Apple Signing & Notarization is mandatory for release. Please configure the missing secrets in GitHub Settings."
+            exit 1
+          fi
+          echo "✅ All Apple Developer credentials verified."
+
       - name: Install Apple Developer Certificate
-        if: ${{ env.MACOS_CERTIFICATE != '' }}
         env:
           MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
@@ -123,20 +153,15 @@ jobs:
           chmod +x Scripts/build_dmg.sh
           ./Scripts/build_dmg.sh
 
-      - name: Notarize macOS DMG with Apple
-        if: ${{ env.APPLE_ID != '' && env.APPLE_APP_SPECIFIC_PASSWORD != '' }}
-        continue-on-error: true
+      - name: Mandatory Apple Notarization & Ticket Stapling
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
+          echo "🚀 Submitting DMG for mandatory Apple Notarization..."
           chmod +x Scripts/notarize.sh
-          if [ -n "$APPLE_TEAM_ID" ]; then
-            ./Scripts/notarize.sh "$APPLE_ID" "$APPLE_TEAM_ID" "$APPLE_APP_SPECIFIC_PASSWORD"
-          else
-            echo "⚠️ APPLE_TEAM_ID secret not set. Skipping Apple Notarization."
-          fi
+          ./Scripts/notarize.sh "$APPLE_ID" "$APPLE_TEAM_ID" "$APPLE_APP_SPECIFIC_PASSWORD"
 
       - name: Package Standalone Application ZIP
         run: |

@@ -32,20 +32,21 @@ if [ -z "$APPLE_ID" ] || [ -z "$TEAM_ID" ] || [ -z "$PASSWORD" ]; then
     exit 1
 fi
 
-echo "🚀 [1/2] Submitting $DMG_PATH to Apple Notary Service..."
-if xcrun notarytool submit "$DMG_PATH" \
+echo "🚀 [1/3] Submitting $DMG_PATH to Apple Notary Service..."
+xcrun notarytool submit "$DMG_PATH" \
     --apple-id "$APPLE_ID" \
     --team-id "$TEAM_ID" \
     --password "$PASSWORD" \
-    --wait; then
+    --wait
 
-    echo "📎 [2/2] Stapling notarization ticket to DMG..."
-    xcrun stapler staple "$DMG_PATH" || true
-    echo "✅ ezku.link DMG successfully notarized and stapled!"
-    echo "🎉 Users downloading this DMG will open it directly with ZERO Gatekeeper warnings."
-else
-    echo "⚠️ Apple Notarization could not be completed."
-    echo "ℹ️ Note: Apple requires an active paid Apple Developer Program membership for notarization."
-    echo "ℹ️ The DMG remains signed with your Apple Developer identity and will be published."
-    exit 0
-fi
+echo "📎 [2/3] Stapling Apple Notarization ticket to DMG..."
+xcrun stapler staple "$DMG_PATH"
+
+echo "🔍 [3/3] Validating Gatekeeper notarization ticket..."
+xcrun stapler validate "$DMG_PATH"
+spctl -a -t open --context context:primary-signature -v "$DMG_PATH" || true
+
+echo "=========================================================="
+echo "✅ ezku.link DMG successfully verified, signed, and notarized!"
+echo "🎉 Gatekeeper will now open this DMG with ZERO security alerts."
+echo "=========================================================="
