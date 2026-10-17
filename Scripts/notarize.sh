@@ -22,7 +22,7 @@ if [ -z "$APPLE_ID" ] || [ -z "$TEAM_ID" ] || [ -z "$PASSWORD" ]; then
     echo "  ./Scripts/notarize.sh <apple-id> <team-id> <app-specific-password>"
     echo ""
     echo "Example:"
-    echo "  ./Scripts/notarize.sh rinturajc@gmail.com 53647RA5WL abcd-efgh-ijkl-mnop"
+    echo "  ./Scripts/notarize.sh rinturajc@gmail.com 83PMR35RH6 abcd-efgh-ijkl-mnop"
     echo ""
     echo "To generate an App-Specific Password:"
     echo "  1. Sign in to https://appleid.apple.com"
