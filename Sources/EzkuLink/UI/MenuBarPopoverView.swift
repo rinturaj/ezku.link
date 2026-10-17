@@ -1383,6 +1383,20 @@ public struct MenuBarPopoverView: View {
         .shadow(color: Color.black.opacity(0.3), radius: 5, y: 2)
     }
     
+    private var videoDropZoneBackgroundColor: Color {
+        if isDropTargeted {
+            return AppColors.brandBlue.opacity(0.12)
+        }
+        return colorScheme == .dark ? Color.white.opacity(0.04) : Color.black.opacity(0.035)
+    }
+    
+    private var videoDropZoneBorderColor: Color {
+        if isDropTargeted {
+            return AppColors.brandBlue
+        }
+        return colorScheme == .dark ? Color.white.opacity(0.16) : Color.black.opacity(0.15)
+    }
+
     private var videoDropZoneContent: some View {
         VStack(spacing: 10) {
             videoDropZoneIcon
@@ -1404,20 +1418,11 @@ public struct MenuBarPopoverView: View {
         .padding(.vertical, 20)
         .background(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(
-                    isDropTargeted
-                    ? AppColors.brandBlue.opacity(0.12)
-                    : (colorScheme == .dark ? Color.white.opacity(0.04) : Color.black.opacity(0.035))
-                )
+                .fill(videoDropZoneBackgroundColor)
         )
         .overlay(
             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(
-                    isDropTargeted
-                    ? AppColors.brandBlue
-                    : (colorScheme == .dark ? Color.white.opacity(0.16) : Color.black.opacity(0.15)),
-                    style: StrokeStyle(lineWidth: 1.2, dash: [5])
-                )
+                .stroke(videoDropZoneBorderColor, style: StrokeStyle(lineWidth: 1.2, dash: [5]))
         )
     }
     

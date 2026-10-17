@@ -77,30 +77,75 @@ public struct WelcomeView: View {
         .frame(minWidth: 500, idealWidth: 540, maxWidth: .infinity, minHeight: 610, idealHeight: 650, maxHeight: .infinity)
     }
     
+    // MARK: - Color and Gradient Helpers
+    private var isDark: Bool {
+        colorScheme == .dark
+    }
+    
+    private var windowBackingColor: Color {
+        isDark ? AppColors.brandDark : Color(NSColor.windowBackgroundColor)
+    }
+    
+    private var windowBorderGradient: LinearGradient {
+        if isDark {
+            return LinearGradient(
+                colors: [Color.white.opacity(0.3), Color.white.opacity(0.05), Color.clear],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        } else {
+            return LinearGradient(
+                colors: [Color.black.opacity(0.15), Color.black.opacity(0.05), Color.clear],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        }
+    }
+    
+    private var spotlightBadgeBackground: Color {
+        isDark ? Color.white.opacity(0.12) : Color.black.opacity(0.06)
+    }
+    
+    private var spotlightBadgeBorder: Color {
+        isDark ? Color.white.opacity(0.2) : Color.black.opacity(0.12)
+    }
+    
+    private var spotlightCardBackground: Color {
+        isDark ? Color.white.opacity(0.04) : Color.black.opacity(0.035)
+    }
+    
+    private var spotlightCardBorder: Color {
+        isDark ? Color.white.opacity(0.08) : Color.black.opacity(0.08)
+    }
+    
+    private var supportButtonBackground: Color {
+        isDark ? Color.white.opacity(0.06) : Color.black.opacity(0.04)
+    }
+    
+    private var supportButtonBorder: Color {
+        isDark ? Color.white.opacity(0.12) : Color.black.opacity(0.08)
+    }
+    
+    private var stepRowBackground: Color {
+        isDark ? Color.white.opacity(0.04) : Color(NSColor.controlBackgroundColor)
+    }
+    
+    private var stepRowBorder: Color {
+        isDark ? Color.white.opacity(0.08) : Color(NSColor.separatorColor)
+    }
+    
     // MARK: - Subviews
     private var backgroundLayer: some View {
         ZStack {
             VisualEffectView(material: .hudWindow, blendingMode: .withinWindow)
                 .ignoresSafeArea()
-            (colorScheme == .dark ? AppColors.brandDark : Color(NSColor.windowBackgroundColor))
-                .opacity(colorScheme == .dark ? 0.95 : 0.96)
+            
+            windowBackingColor
+                .opacity(isDark ? 0.95 : 0.96)
                 .ignoresSafeArea()
             
             RoundedRectangle(cornerRadius: 24)
-                .stroke(
-                    colorScheme == .dark
-                    ? LinearGradient(
-                        colors: [Color.white.opacity(0.3), Color.white.opacity(0.05), Color.clear],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                      )
-                    : LinearGradient(
-                        colors: [Color.black.opacity(0.15), Color.black.opacity(0.05), Color.clear],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                      ),
-                    lineWidth: 1
-                )
+                .stroke(windowBorderGradient, lineWidth: 1)
                 .padding(1)
         }
     }
@@ -167,6 +212,23 @@ public struct WelcomeView: View {
         .padding(.horizontal, 20)
     }
     
+    private var menuBarBadge: some View {
+        HStack(spacing: 5) {
+            Image(systemName: MenuBarController.currentToolbarSymbolName())
+                .font(.system(size: 12, weight: .semibold))
+            Text("ezku.link")
+                .font(.system(size: 11, weight: .bold))
+        }
+        .foregroundColor(Color(NSColor.labelColor))
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
+        .background(spotlightBadgeBackground)
+        .clipShape(Capsule())
+        .overlay(
+            Capsule().stroke(spotlightBadgeBorder, lineWidth: 1)
+        )
+    }
+    
     private var menuBarSpotlightSection: some View {
         HStack(spacing: 10) {
             Image(systemName: "arrow.up.circle.fill")
@@ -179,45 +241,14 @@ public struct WelcomeView: View {
             
             Spacer()
             
-            HStack(spacing: 5) {
-                Image(systemName: MenuBarController.currentToolbarSymbolName())
-                    .font(.system(size: 12, weight: .semibold))
-                Text("ezku.link")
-                    .font(.system(size: 11, weight: .bold))
-            }
-            .foregroundColor(Color(NSColor.labelColor))
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(
-                colorScheme == .dark
-                ? Color.white.opacity(0.12)
-                : Color.black.opacity(0.06)
-            )
-            .clipShape(Capsule())
-            .overlay(
-                Capsule().stroke(
-                    colorScheme == .dark
-                    ? Color.white.opacity(0.2)
-                    : Color.black.opacity(0.12),
-                    lineWidth: 1
-                )
-            )
+            menuBarBadge
         }
         .padding(10)
-        .background(
-            colorScheme == .dark
-            ? Color.white.opacity(0.04)
-            : Color.black.opacity(0.035)
-        )
+        .background(spotlightCardBackground)
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(
-                    colorScheme == .dark
-                    ? Color.white.opacity(0.08)
-                    : Color.black.opacity(0.08),
-                    lineWidth: 1
-                )
+                .stroke(spotlightCardBorder, lineWidth: 1)
         )
         .padding(.horizontal, 20)
         .accessibilityElement(children: .combine)
@@ -280,15 +311,10 @@ public struct WelcomeView: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
             .background(
-                Capsule()
-                    .fill(colorScheme == .dark ? Color.white.opacity(0.06) : Color.black.opacity(0.04))
+                Capsule().fill(supportButtonBackground)
             )
             .overlay(
-                Capsule()
-                    .stroke(
-                        colorScheme == .dark ? Color.white.opacity(0.12) : Color.black.opacity(0.08),
-                        lineWidth: 0.8
-                    )
+                Capsule().stroke(supportButtonBorder, lineWidth: 0.8)
             )
         }
         .buttonStyle(.plain)
@@ -346,20 +372,11 @@ public struct WelcomeView: View {
             Spacer()
         }
         .padding(10)
-        .background(
-            colorScheme == .dark
-            ? Color.white.opacity(0.04)
-            : Color(NSColor.controlBackgroundColor)
-        )
+        .background(stepRowBackground)
         .cornerRadius(12)
         .overlay(
             RoundedRectangle(cornerRadius: 12)
-                .stroke(
-                    colorScheme == .dark
-                    ? Color.white.opacity(0.08)
-                    : Color(NSColor.separatorColor),
-                    lineWidth: 1
-                )
+                .stroke(stepRowBorder, lineWidth: 1)
         )
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Step \(stepNumber): \(title). \(description)")
