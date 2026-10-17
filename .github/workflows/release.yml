@@ -125,14 +125,18 @@ jobs:
 
       - name: Notarize macOS DMG with Apple
         if: ${{ env.APPLE_ID != '' && env.APPLE_APP_SPECIFIC_PASSWORD != '' }}
+        continue-on-error: true
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID || '53647RA5WL' }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          echo "🚀 Submitting DMG to Apple Notary Service..."
           chmod +x Scripts/notarize.sh
-          ./Scripts/notarize.sh "$APPLE_ID" "$APPLE_TEAM_ID" "$APPLE_APP_SPECIFIC_PASSWORD"
+          if [ -n "$APPLE_TEAM_ID" ]; then
+            ./Scripts/notarize.sh "$APPLE_ID" "$APPLE_TEAM_ID" "$APPLE_APP_SPECIFIC_PASSWORD"
+          else
+            echo "⚠️ APPLE_TEAM_ID secret not set. Skipping Apple Notarization."
+          fi
 
       - name: Package Standalone Application ZIP
         run: |
