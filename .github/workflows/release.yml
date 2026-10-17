@@ -85,6 +85,32 @@ jobs:
           # Update Info.plist with resolved version if PlistBuddy is available
           /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $CLEAN_VER" "Resources/Info.plist" 2>/dev/null || true
 
+      - name: Install Apple Developer Certificate
+        if: ${{ env.MACOS_CERTIFICATE != '' }}
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+        run: |
+          KEYCHAIN_PATH="$RUNNER_TEMP/build.keychain"
+          KEYCHAIN_PASSWORD=$(openssl rand -base64 32)
+          
+          # Create and configure temporary keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          
+          # Import .p12 certificate
+          echo "$MACOS_CERTIFICATE" | base64 --decode > "$RUNNER_TEMP/certificate.p12"
+          security import "$RUNNER_TEMP/certificate.p12" -P "$MACOS_CERTIFICATE_PWD" -A -t cert -f pkcs12 -k "$KEYCHAIN_PATH"
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          
+          # Add to search list
+          security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | sed -e 's/"//g')
+          rm -f "$RUNNER_TEMP/certificate.p12"
+          
+          echo "✅ Apple Developer Certificate successfully installed into runner keychain."
+          security find-identity -p codesigning -v
+
       - name: Compile & Package Application Bundle
         run: |
           echo "🔨 Building Release App Bundle..."
@@ -96,6 +122,17 @@ jobs:
           echo "💿 Creating DMG installer..."
           chmod +x Scripts/build_dmg.sh
           ./Scripts/build_dmg.sh
+
+      - name: Notarize macOS DMG with Apple
+        if: ${{ env.APPLE_ID != '' && env.APPLE_APP_SPECIFIC_PASSWORD != '' }}
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID || '53647RA5WL' }}
+        run: |
+          echo "🚀 Submitting DMG to Apple Notary Service..."
+          chmod +x Scripts/notarize.sh
+          ./Scripts/notarize.sh "$APPLE_ID" "$APPLE_TEAM_ID" "$APPLE_APP_SPECIFIC_PASSWORD"
 
       - name: Package Standalone Application ZIP
         run: |
@@ -128,3 +165,10 @@ jobs:
             build/SHA256SUMS.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clean Up Keychain
+        if: always()
+        run: |
+          if [ -f "$RUNNER_TEMP/build.keychain" ]; then
+            security delete-keychain "$RUNNER_TEMP/build.keychain" 2>/dev/null || true
+          fi

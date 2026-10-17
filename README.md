@@ -78,12 +78,6 @@
 2. Open `ezku.link.dmg` and drag **ezku.link** into **Applications**.
 3. Launch **ezku.link** from Spotlight or Applications.
 
-> [!NOTE]
-> **First-time macOS Gatekeeper Notice**:
-> Because ezku.link is an open-source tool without a paid Apple Developer certificate, macOS may show a *"not opened / cannot verify developer"* alert.
-> - **Easy fix**: Go to **System Settings > Privacy & Security**, scroll down to Security, and click **"Open Anyway"**.
-> - **Or via Terminal**: `xattr -cr /Applications/ezku.link.app` (or on the downloaded `.dmg`).
-
 ### Option 2: Build & Run from Source
 
 **Prerequisites**: macOS 14.0+ on Apple Silicon (M1/M2/M3/M4), Xcode Command Line Tools (`xcode-select --install`).
