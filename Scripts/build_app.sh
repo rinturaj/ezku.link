@@ -42,8 +42,29 @@ if [ -f "Resources/MenuBarIcon@2x.png" ]; then
     cp "Resources/MenuBarIcon@2x.png" "$RESOURCES_DIR/MenuBarIcon@2x.png"
 fi
 
-echo "🔏 [4/4] Applying Ad-Hoc Code Signature..."
-codesign --force --deep --sign - --identifier "link.ezku.mac" --entitlements "Resources/EzkuLink.entitlements" "$APP_BUNDLE"
+# 4. Code Signing
+SIGNING_IDENTITY="${SIGNING_IDENTITY:-}"
+if [ -z "$SIGNING_IDENTITY" ]; then
+    DEV_ID=$(security find-identity -p codesigning -v 2>/dev/null | grep "Developer ID Application" | head -n 1 | sed -E 's/.*"([^"]+)".*/\1/' || true)
+    if [ -n "$DEV_ID" ]; then
+        SIGNING_IDENTITY="$DEV_ID"
+    else
+        APP_DEV=$(security find-identity -p codesigning -v 2>/dev/null | grep "Apple Development" | head -n 1 | sed -E 's/.*"([^"]+)".*/\1/' || true)
+        if [ -n "$APP_DEV" ]; then
+            SIGNING_IDENTITY="$APP_DEV"
+        else
+            SIGNING_IDENTITY="-"
+        fi
+    fi
+fi
+
+if [ "$SIGNING_IDENTITY" != "-" ]; then
+    echo "🔏 [4/4] Signing with Identity: $SIGNING_IDENTITY (Hardened Runtime + Timestamp)..."
+    codesign --force --deep --options runtime --timestamp --sign "$SIGNING_IDENTITY" --identifier "link.ezku.mac" --entitlements "Resources/EzkuLink.entitlements" "$APP_BUNDLE"
+else
+    echo "🔏 [4/4] Applying Ad-Hoc Code Signature..."
+    codesign --force --deep --sign - --identifier "link.ezku.mac" --entitlements "Resources/EzkuLink.entitlements" "$APP_BUNDLE"
+fi
 
 echo "✅ Build Complete! App available at:"
 echo "👉 $APP_BUNDLE"

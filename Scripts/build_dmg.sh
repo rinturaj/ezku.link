@@ -113,9 +113,29 @@ echo "🗜️  Compressing DMG (UDZO format)..."
 hdiutil convert "$TMP_DMG" -format UDZO -imagekey zlib-level=9 -ov -o "$FINAL_DMG" -quiet
 rm -f "$TMP_DMG"
 
-# 12. Code sign the DMG (ad-hoc)
-echo "🔏 Signing DMG..."
-codesign --force --sign - "$FINAL_DMG" 2>/dev/null || true
+# 12. Code sign the DMG
+SIGNING_IDENTITY="${SIGNING_IDENTITY:-}"
+if [ -z "$SIGNING_IDENTITY" ]; then
+    DEV_ID=$(security find-identity -p codesigning -v 2>/dev/null | grep "Developer ID Application" | head -n 1 | sed -E 's/.*"([^"]+)".*/\1/' || true)
+    if [ -n "$DEV_ID" ]; then
+        SIGNING_IDENTITY="$DEV_ID"
+    else
+        APP_DEV=$(security find-identity -p codesigning -v 2>/dev/null | grep "Apple Development" | head -n 1 | sed -E 's/.*"([^"]+)".*/\1/' || true)
+        if [ -n "$APP_DEV" ]; then
+            SIGNING_IDENTITY="$APP_DEV"
+        else
+            SIGNING_IDENTITY="-"
+        fi
+    fi
+fi
+
+if [ "$SIGNING_IDENTITY" != "-" ]; then
+    echo "🔏 Signing DMG with Identity: $SIGNING_IDENTITY..."
+    codesign --force --timestamp --sign "$SIGNING_IDENTITY" "$FINAL_DMG" 2>/dev/null || true
+else
+    echo "🔏 Applying Ad-Hoc Signature to DMG..."
+    codesign --force --sign - "$FINAL_DMG" 2>/dev/null || true
+fi
 
 # Extract version for informational display
 VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$APP_BUNDLE/Contents/Info.plist" 2>/dev/null || echo "1.0.0")
