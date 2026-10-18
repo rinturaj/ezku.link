@@ -85,38 +85,24 @@ jobs:
           # Update Info.plist with resolved version if PlistBuddy is available
           /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $CLEAN_VER" "Resources/Info.plist" 2>/dev/null || true
 
-      - name: Validate Apple Developer Credentials
+      - name: Check Signing Mode (Apple Developer vs Ad-Hoc)
+        id: signing_mode
         env:
           MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          echo "🔐 Validating required Apple Developer credentials..."
-          MISSING=0
-          if [ -z "$MACOS_CERTIFICATE" ]; then
-            echo "❌ Error: 'MACOS_CERTIFICATE' secret is missing."
-            MISSING=1
+          if [ -n "$MACOS_CERTIFICATE" ] && [ -n "$APPLE_ID" ] && [ -n "$APPLE_APP_SPECIFIC_PASSWORD" ] && [ -n "$APPLE_TEAM_ID" ]; then
+            echo "mode=apple" >> "$GITHUB_OUTPUT"
+            echo "🔐 Apple Developer credentials found. Full Developer ID signing and Apple Notarization will be performed."
+          else
+            echo "mode=adhoc" >> "$GITHUB_OUTPUT"
+            echo "🔓 Apple Developer credentials not provided. Proceeding with Ad-Hoc code signing (codesign -s -)."
           fi
-          if [ -z "$APPLE_ID" ]; then
-            echo "❌ Error: 'APPLE_ID' secret is missing."
-            MISSING=1
-          fi
-          if [ -z "$APPLE_APP_SPECIFIC_PASSWORD" ]; then
-            echo "❌ Error: 'APPLE_APP_SPECIFIC_PASSWORD' secret is missing."
-            MISSING=1
-          fi
-          if [ -z "$APPLE_TEAM_ID" ]; then
-            echo "❌ Error: 'APPLE_TEAM_ID' secret is missing."
-            MISSING=1
-          fi
-          if [ "$MISSING" -eq 1 ]; then
-            echo "🚨 Apple Signing & Notarization is mandatory for release. Please configure the missing secrets in GitHub Settings."
-            exit 1
-          fi
-          echo "✅ All Apple Developer credentials verified."
 
       - name: Install Apple Developer Certificate
+        if: steps.signing_mode.outputs.mode == 'apple'
         env:
           MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
           MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
@@ -153,13 +139,14 @@ jobs:
           chmod +x Scripts/build_dmg.sh
           ./Scripts/build_dmg.sh
 
-      - name: Mandatory Apple Notarization & Ticket Stapling
+      - name: Apple Notarization & Ticket Stapling
+        if: steps.signing_mode.outputs.mode == 'apple'
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          echo "🚀 Submitting DMG for mandatory Apple Notarization..."
+          echo "🚀 Submitting DMG for Apple Notarization..."
           chmod +x Scripts/notarize.sh
           ./Scripts/notarize.sh "$APPLE_ID" "$APPLE_TEAM_ID" "$APPLE_APP_SPECIFIC_PASSWORD"
 
