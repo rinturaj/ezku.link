@@ -250,7 +250,7 @@
 							<source src="/assets/demo.mp4" type="video/mp4" />
 							<source src="/assets/demo.webm" type="video/webm" />
 							<img
-								src="/assets/demo.original.gif"
+								src="/assets/demo-poster.jpg"
 								alt="ezku.link macOS App Demo"
 								class="embedded-video"
 							/>

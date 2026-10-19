@@ -20,7 +20,10 @@ export default defineConfig({
 			}),
 			prerender: {
 				entries: ['*', '/llms.txt', '/llms-full.txt', '/robots.txt', '/sitemap.xml'],
-				handleUnseenRoutes: 'ignore'
+				handleUnseenRoutes: 'ignore',
+				handleHttpError: ({ status, path, referrer }) => {
+					console.warn(`[prerender warning] ${status} for ${path} (linked from ${referrer})`);
+				}
 			}
 		})
 	]
