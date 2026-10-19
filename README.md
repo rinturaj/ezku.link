@@ -70,7 +70,25 @@
 <a id="quick-start"></a>
 ## 🚀 Installation & Quick Start
 
-### Option 1: Download Pre-Built DMG (Recommended)
+### Option 1: Homebrew (Recommended)
+
+```bash
+brew install --cask ezku-link
+```
+
+To update to the latest version:
+
+```bash
+brew upgrade ezku-link
+```
+
+To uninstall:
+
+```bash
+brew uninstall ezku-link
+```
+
+### Option 2: Download Pre-Built DMG
 
 1. Download the latest release from [GitHub Releases](https://github.com/rinturaj/ezku.link/releases/latest):
    - **`ezku.link.dmg`**: Official macOS drag-and-drop installer.
@@ -78,7 +96,9 @@
 2. Open `ezku.link.dmg` and drag **ezku.link** into **Applications**.
 3. Launch **ezku.link** from Spotlight or Applications.
 
-### Option 2: Build & Run from Source
+> **Note**: If macOS shows a security warning, go to **System Settings → Privacy & Security** and click **"Open Anyway"**.
+
+### Option 3: Build & Run from Source
 
 **Prerequisites**: macOS 14.0+ on Apple Silicon (M1/M2/M3/M4), Xcode Command Line Tools (`xcode-select --install`).
 

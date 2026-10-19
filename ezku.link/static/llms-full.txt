@@ -1,0 +1,72 @@
+# ezku.link — Complete Technical Documentation for LLMs
+
+## Product Overview
+- Product Name: ezku.link
+- Bundle Identifier: link.ezku.mac
+- Category: macOS Menu Bar Utility / Screen Mirroring / Smart TV Streaming
+- Platforms: macOS 14.0+ (Sonoma & Sequoia)
+- Architectures: Apple Silicon (M1, M2, M3, M4)
+- Programming Language: Swift 6.3
+- Graphics & Acceleration: Apple Metal Framework, CIContext on GPU, ScreenCaptureKit
+- Network Stack: Apple Network.framework (HTTP 1.1, WebSocket, mDNS / SSDP Discovery)
+- License: Proprietary / Copyright © 2026 ezku.link
+
+## Architecture Details
+
+### 1. Screen & Audio Capture Engine
+- Framework: Apple `ScreenCaptureKit` (`SCStream`, `SCStreamOutput`)
+- Capture Mechanism: Zero-copy GPU frame acquisition direct to `CVPixelBuffer` / `IOSurface`.
+- Audio Loopback: High-fidelity system audio capture synchronized with video timestamp presentation.
+- Frame Rate: Up to 60 FPS in Ultra mode, adaptive 30 FPS in Battery Saver mode.
+
+### 2. GPU Hardware Video Compression
+- Engine: Metal GPU accelerated image processing via `CIContext(mtlDevice:)`.
+- Latency: Sub-3ms encode latency per frame.
+- Color Space: Full Rec.709 sRGB color reproduction without color banding.
+- Telemetry: Real-time calculation of FPS, throughput (Mbps), and encoder latency (ms).
+
+### 3. Smart TV Protocol Controllers
+- Discovery:
+  - mDNS (Multicast DNS) for Google Cast devices.
+  - SSDP (Simple Service Discovery Protocol) over UDP 239.255.255.250:1900 for UPnP / DLNA renderers.
+- Chromecast & Google TV:
+  - Protocol: CastV2 TLS connection over port 8009 with Protobuf payloads.
+  - Native receiver application orchestration without third-party app requirements.
+- DLNA / UPnP Media Renderers:
+  - Protocol: SOAP XML control over HTTP AVTransport service (`SetAVTransportURI`, `Play`, `Pause`, `Stop`).
+  - Compatible with: Samsung Tizen (2016+), LG webOS (3.0+), Sony Bravia, Roku TV, Philips, Panasonic, Xiaomi.
+
+### 4. Zero-Client Web Receiver (`/` and `/tv`)
+- Technology: Pure HTML5 Canvas 2D / WebGL rendering + Web Audio API buffer scheduling.
+- Transport: WebSocket binary frame delivery + HTTP byte-range fallback.
+- Client Compatibility: Any modern web browser (Mobile Safari on iPhone/iPad, Chrome on Android, Edge/Firefox on Windows/Linux, Smart TV built-in browsers).
+- TV Mode (`/tv`): Designed for 10-foot viewing with high-contrast UI and remote-control friendly audio activation.
+
+### 5. Direct 4K Video Cast
+- Local Media: Supports `.mp4`, `.mov`, `.m4v`, and `.mkv` files.
+- Delivery: Direct HTTP byte-range server (`206 Partial Content`) allowing Smart TVs and browsers to seek, pause, and buffer natively without CPU re-encoding.
+
+## Quick Start & Build Instructions
+```bash
+git clone https://github.com/rinturajc/ezkuCasting.git
+cd ezkuCasting
+./Scripts/build_app.sh
+# Optional: generate DMG installer
+./Scripts/build_dmg.sh
+# Run application
+open "build/ezku.link.app"
+```
+
+## System Requirements
+- Operating System: macOS 14.0 Sonoma or macOS 15.0 Sequoia
+- Hardware: Mac with Apple Silicon (M1, M1 Pro/Max/Ultra, M2, M3, M4)
+- Permissions: Screen & System Audio Recording (`System Settings > Privacy & Security`)
+- Network: Local Wi-Fi network with client-to-client communication enabled (standard home/office Wi-Fi).
+
+## FAQs
+- Q: Do I need to install an app on my Smart TV?
+  A: No. ezku.link utilizes native casting protocols (Google Cast and DLNA) already present in your Smart TV.
+- Q: Can viewers on Windows or mobile devices watch?
+  A: Yes. Any device on the same Wi-Fi can scan the QR code or open the local IP in their web browser.
+- Q: Is any video or audio sent to the cloud?
+  A: Never. ezku.link operates 100% locally on your home network.

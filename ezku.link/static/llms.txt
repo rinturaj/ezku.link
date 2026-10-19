@@ -1,0 +1,20 @@
+# ezku.link
+
+> Ultra-Fast macOS Screen Mirroring & 4K Smart TV Streaming. Native Apple Silicon menu bar utility with sub-30ms latency, zero-client web receiver, and native Chromecast & DLNA casting.
+
+ezku.link is a high-performance native macOS menu bar utility built in Swift 6.3 with Metal GPU hardware acceleration and Apple ScreenCaptureKit. It lives quietly in the macOS status bar (`NSStatusItem`, `LSUIElement`), creating zero dock clutter while enabling 1-click broadcast of screens, windows, or 4K videos to any Smart TV or browser on local Wi-Fi.
+
+## Key Capabilities
+- **Smart TV Direct Casting**: Discovers and casts directly to Chromecast, Google TV, Samsung Tizen, LG webOS, Sony Bravia, and Roku TVs using native Google Cast V2 and DLNA UPnP protocols without requiring any TV app installation.
+- **Zero-Client Web Streaming**: Serves an ultra-low latency HTML5 Canvas and Web Audio API receiver at the Mac's local network address. Viewers join by scanning a QR code or visiting the URL in Safari, Chrome, Firefox, or Smart TV web browsers.
+- **Direct 4K Video Cast**: Streams local video files (`.mp4`, `.mov`, `.m4v`, `.mkv`) over HTTP byte-range requests with instant seeking and minimal CPU impact.
+- **Sub-30ms Latency**: Apple ScreenCaptureKit zero-copy frame capture combined with Metal GPU compression pipeline delivers 60 FPS real-time responsiveness.
+- **System Audio Capture**: Synchronized system loopback audio capture paired with video frames.
+- **Telemetry HUD**: Live monitoring of frame rate (FPS), output bitrate (Mbps), frame encode duration (ms), and viewer counts.
+- **100% Local & Private**: All streams stay strictly on local Wi-Fi. Zero cloud servers, zero telemetry tracking.
+
+## Core Links
+- [Full Technical Documentation](https://ezku.link/llms-full.txt): Deep technical architecture, protocol implementation, build instructions, and FAQ.
+- [Website](https://ezku.link): Official landing page and release downloads.
+- [GitHub Repository](https://github.com/rinturajc/ezkuCasting): Swift source code and releases.
+- [DMG Download](https://ezku.link/downloads/ezku.link.dmg): Direct macOS installer bundle.
