@@ -1,0 +1,11 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "ezku-link",
+	"compatibility_date": "2026-01-01",
+	"assets": {
+		"directory": "./build",
+		"binding": "ASSETS",
+		"html_handling": "auto-trailing-slash",
+		"not_found_handling": "404-page"
+	}
+}
