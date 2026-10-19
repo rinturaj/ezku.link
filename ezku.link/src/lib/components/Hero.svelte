@@ -4,6 +4,8 @@
 	type CommandMode = 'install' | 'update' | 'uninstall';
 	let activeCommand = $state<CommandMode>('install');
 	let copied = $state(false);
+	let showGatekeeperInfo = $state(false);
+	let isOption2Open = $state(false);
 
 	const commandDetails: Record<
 		CommandMode,
@@ -17,7 +19,7 @@
 		update: {
 			cmd: 'brew upgrade ezku-link',
 			label: 'Update',
-			tip: 'Upgrades to the latest release with notarized Apple Silicon/Intel binaries'
+			tip: 'Upgrades to the latest release for Apple Silicon and Intel Macs'
 		},
 		uninstall: {
 			cmd: 'brew uninstall ezku-link',
@@ -41,7 +43,7 @@
 
 <section class="hero-section" use:scrollReveal>
 	<div class="page-container">
-		<!-- Badges -->
+		<!-- Badges & Sponsor -->
 		<div class="hero-header-row">
 			<div class="badge-wrapper">
 				<span class="ui-badge is-accent">NO TV APPS</span>
@@ -51,7 +53,26 @@
 					1-CLICK MENU BAR
 				</span>
 			</div>
-			<div class="hero-corner-mark" aria-hidden="true">⌟</div>
+			<div class="hero-header-actions">
+				<a
+					href="https://www.buymeacoffee.com/rin2"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="hero-coffee-chip"
+					title="Support ezku.link on Buy Me a Coffee"
+				>
+					<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+						<path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+						<line x1="6" y1="1" x2="6" y2="4" />
+						<line x1="10" y1="1" x2="10" y2="4" />
+						<line x1="14" y1="1" x2="14" y2="4" />
+					</svg>
+					<span>Buy Me a Coffee</span>
+					<span class="coffee-arrow" aria-hidden="true">↗</span>
+				</a>
+				<div class="hero-corner-mark" aria-hidden="true">⌟</div>
+			</div>
 		</div>
 
 		<!-- Main Headline -->
@@ -177,29 +198,127 @@
 					</div>
 				</div>
 
-				<!-- Option 2: Direct .dmg Download & Watch Demo -->
-				<div class="alt-install-row">
-					<div class="alt-meta">
-						<span class="ui-badge">OPTION 2</span>
-						<span class="alt-label">Direct .dmg Installer</span>
-					</div>
+				<!-- Option 2: Direct .dmg Download & Watch Demo (Collapsible) -->
+				<div class="alt-install-box" class:is-expanded={isOption2Open}>
+					<button
+						type="button"
+						class="alt-install-header-btn"
+						onclick={() => (isOption2Open = !isOption2Open)}
+						aria-expanded={isOption2Open}
+						aria-controls="option2-details-content"
+					>
+						<div class="alt-header-left">
+							<span class="ui-badge">OPTION 2</span>
+							<span class="alt-label">Direct .dmg Installer</span>
+							<span class="alt-subtext">Manual offline package</span>
+						</div>
+						<div class="alt-header-right">
+							<span class="alt-toggle-hint">{isOption2Open ? 'Collapse' : 'Show download'}</span>
+							<span class="alt-chevron" class:is-open={isOption2Open}>▾</span>
+						</div>
+					</button>
 
-					<div class="hero-cta-group">
-						<a href="/downloads/ezku.link.dmg" download="ezku.link.dmg" class="btn btn-secondary">
-							<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-								<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-								<polyline points="7 10 12 15 17 10" />
-								<line x1="12" y1="15" x2="12" y2="3" />
-							</svg>
-							<span>Download .dmg</span>
-							<span class="cta-subtag">v1.0 (5.9 MB)</span>
-							<span class="btn-arrow">→</span>
-						</a>
-						<a href="#demo" class="btn btn-secondary">
-							<span>Watch Demo</span>
-							<span class="btn-arrow">↓</span>
-						</a>
-					</div>
+					{#if isOption2Open}
+						<div id="option2-details-content" class="alt-install-body">
+							<div class="alt-actions-row">
+								<div class="hero-cta-group">
+									<a href="/downloads/ezku.link.dmg" download="ezku.link.dmg" class="btn btn-secondary">
+										<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+											<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+											<polyline points="7 10 12 15 17 10" />
+											<line x1="12" y1="15" x2="12" y2="3" />
+										</svg>
+										<span>Download .dmg</span>
+										<span class="cta-subtag">v1.0 (5.9 MB)</span>
+										<span class="btn-arrow">→</span>
+									</a>
+									<a href="#demo" class="btn btn-secondary">
+										<span>Watch Demo</span>
+										<span class="btn-arrow">↓</span>
+									</a>
+								</div>
+
+								<button
+									type="button"
+									class="gatekeeper-pill-btn"
+									onclick={() => (showGatekeeperInfo = !showGatekeeperInfo)}
+									title="Click to view macOS Gatekeeper / unnotarized app instructions"
+								>
+									<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+										<circle cx="12" cy="12" r="10" />
+										<line x1="12" y1="16" x2="12" y2="12" />
+										<line x1="12" y1="8" x2="12.01" y2="8" />
+									</svg>
+									<span>Unnotarized App Info</span>
+									<span class="caret-icon" class:is-open={showGatekeeperInfo}>▾</span>
+								</button>
+							</div>
+
+							<!-- Unnotarized Gatekeeper Notice Strip -->
+							<div class="dmg-notice-strip">
+								<span class="notice-bullet">⚠️</span>
+								<span class="notice-text">
+									<strong>Not notarized by Apple:</strong> On first launch, macOS may prompt an unverified developer warning.
+									<button type="button" class="notice-link-btn" onclick={() => (showGatekeeperInfo = !showGatekeeperInfo)}>
+										{showGatekeeperInfo ? 'Hide instructions' : 'How to open (Right-click → Open)'}
+									</button>
+								</span>
+							</div>
+
+							{#if showGatekeeperInfo}
+								<div class="gatekeeper-guide-card">
+									<div class="guide-header">
+										<div class="guide-title-wrap">
+											<span class="guide-shield-icon">🛡️</span>
+											<div>
+												<h4 class="guide-title">Opening Unnotarized Apps on macOS</h4>
+												<p class="guide-subtitle">ezku.link is free &amp; open-source without an annual Apple Developer certificate.</p>
+											</div>
+										</div>
+										<button
+											type="button"
+											class="guide-close-btn"
+											onclick={() => (showGatekeeperInfo = false)}
+											aria-label="Close Guide"
+										>×</button>
+									</div>
+
+									<div class="guide-steps-grid">
+										<div class="guide-step-card">
+											<div class="step-badge">Step 1</div>
+											<div class="step-content">
+												<p class="step-action">Drag into Applications</p>
+												<p class="step-desc">Open the downloaded DMG and drag <code>ezku.link.app</code> into your <strong>Applications</strong> folder.</p>
+											</div>
+										</div>
+
+										<div class="guide-step-card is-highlighted">
+											<div class="step-badge">Step 2</div>
+											<div class="step-content">
+												<p class="step-action">Right-Click → Open</p>
+												<p class="step-desc"><strong>Right-click</strong> (or Control-click) <code>ezku.link.app</code> and select <strong>Open</strong> from the context menu.</p>
+											</div>
+										</div>
+
+										<div class="guide-step-card">
+											<div class="step-badge">Step 3</div>
+											<div class="step-content">
+												<p class="step-action">Confirm Open</p>
+												<p class="step-desc">Click <strong>Open</strong> in the dialog. (Or open <em>System Settings → Privacy &amp; Security → Open Anyway</em>).</p>
+											</div>
+										</div>
+									</div>
+
+									<div class="guide-homebrew-tip">
+										<span class="tip-icon">💡</span>
+										<span>
+											<strong>Prefer zero warnings?</strong> Option 1 (Homebrew) automatically bypasses Gatekeeper on install.
+										</span>
+									</div>
+								</div>
+							{/if}
+						</div>
+					{/if}
 				</div>
 			</div>
 
@@ -209,6 +328,23 @@
 				<span>Apple Silicon M1/M2/M3/M4</span>
 				<span class="dot-sep">•</span>
 				<span>100% Free &amp; Private</span>
+				<span class="dot-sep">•</span>
+				<a
+					href="https://www.buymeacoffee.com/rin2"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="hero-specs-coffee"
+				>
+					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+						<path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+						<path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+						<line x1="6" y1="1" x2="6" y2="4" />
+						<line x1="10" y1="1" x2="10" y2="4" />
+						<line x1="14" y1="1" x2="14" y2="4" />
+					</svg>
+					<span>Support on Buy Me a Coffee</span>
+					<span class="coffee-arrow" aria-hidden="true">↗</span>
+				</a>
 			</div>
 		</div>
 
@@ -251,6 +387,8 @@
 		margin-bottom: 24px;
 		border-bottom: 1px solid var(--line);
 		padding-bottom: 16px;
+		gap: 14px;
+		flex-wrap: wrap;
 	}
 
 	.badge-wrapper {
@@ -258,6 +396,48 @@
 		align-items: center;
 		gap: 10px;
 		flex-wrap: wrap;
+	}
+
+	.hero-header-actions {
+		display: inline-flex;
+		align-items: center;
+		gap: 14px;
+	}
+
+	.hero-coffee-chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 4px 11px;
+		border-radius: var(--r-pill);
+		background: var(--amber-bg);
+		border: 1px solid var(--amber-border);
+		color: var(--amber-hover);
+		font-family: var(--mono);
+		font-size: 11px;
+		font-weight: 600;
+		text-decoration: none;
+		letter-spacing: 0.03em;
+		transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+	}
+
+	.hero-coffee-chip:hover {
+		transform: translateY(-1px);
+		border-color: var(--amber);
+		background: rgba(245, 158, 11, 0.22);
+		color: var(--amber-deep);
+		box-shadow: 0 2px 10px rgba(245, 158, 11, 0.2);
+	}
+
+	.hero-coffee-chip .coffee-arrow {
+		font-size: 10px;
+		opacity: 0.75;
+		transition: transform 0.15s ease, opacity 0.15s ease;
+	}
+
+	.hero-coffee-chip:hover .coffee-arrow {
+		transform: translate(1px, -1px);
+		opacity: 1;
 	}
 
 	.hero-corner-mark {
@@ -536,31 +716,116 @@
 		font-weight: 600;
 	}
 
-	/* Option 2 Alternative Strip */
-	.alt-install-row {
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		gap: 14px;
-		flex-wrap: wrap;
-		padding: 10px 16px;
+	/* Option 2 Collapsible Container */
+	.alt-install-box {
 		background: var(--bg-card-alt);
 		border: 1px solid var(--line);
 		border-radius: var(--r-md);
+		overflow: hidden;
+		transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 	}
 
-	.alt-meta {
+	.alt-install-box:hover {
+		border-color: var(--line-strong, #3a3a3c);
+	}
+
+	.alt-install-box.is-expanded {
+		border-color: var(--line-strong, #3a3a3c);
+		box-shadow: var(--shadow-sm);
+	}
+
+	.alt-install-header-btn {
+		width: 100%;
 		display: flex;
 		align-items: center;
-		gap: 8px;
+		justify-content: space-between;
+		gap: 12px;
+		padding: 10px 16px;
+		background: transparent;
+		border: none;
+		cursor: pointer;
+		text-align: left;
+		transition: background-color 0.15s ease;
+	}
+
+	.alt-install-header-btn:hover {
+		background: rgba(255, 255, 255, 0.03);
+	}
+
+	.alt-header-left {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		flex-wrap: wrap;
 	}
 
 	.alt-label {
 		font-size: 12px;
 		font-family: var(--mono);
 		font-weight: 600;
-		color: var(--ink-2);
+		color: var(--ink);
 		letter-spacing: 0.02em;
+	}
+
+	.alt-subtext {
+		font-family: var(--mono);
+		font-size: 11px;
+		color: var(--ink-3);
+	}
+
+	.alt-header-right {
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		flex-shrink: 0;
+	}
+
+	.alt-toggle-hint {
+		font-family: var(--mono);
+		font-size: 10.5px;
+		font-weight: 600;
+		color: var(--amber-hover);
+		letter-spacing: 0.04em;
+		text-transform: uppercase;
+	}
+
+	.alt-chevron {
+		font-size: 11px;
+		color: var(--ink-2);
+		transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+		display: inline-block;
+	}
+
+	.alt-chevron.is-open {
+		transform: rotate(180deg);
+	}
+
+	.alt-install-body {
+		padding: 14px 16px 16px;
+		border-top: 1px dashed var(--line);
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+		animation: fadeInSlide 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	@keyframes fadeInSlide {
+		from {
+			opacity: 0;
+			transform: translateY(-4px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.alt-actions-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 14px;
+		flex-wrap: wrap;
 	}
 
 	.hero-cta-group {
@@ -577,6 +842,213 @@
 		padding: 2px 6px;
 		background: rgba(0, 0, 0, 0.08);
 		border-radius: var(--r-xs);
+	}
+
+	/* Gatekeeper Notice & First Open Guide */
+	.gatekeeper-pill-btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 3px 9px;
+		border-radius: var(--r-pill);
+		background: var(--amber-bg);
+		border: 1px solid var(--amber-border);
+		color: var(--amber-hover);
+		font-family: var(--mono);
+		font-size: 11px;
+		font-weight: 600;
+		cursor: pointer;
+		transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+	}
+
+	.gatekeeper-pill-btn:hover {
+		transform: translateY(-1px);
+		border-color: var(--amber);
+		background: rgba(245, 158, 11, 0.22);
+	}
+
+	.caret-icon {
+		font-size: 10px;
+		transition: transform 0.2s ease;
+		display: inline-block;
+	}
+
+	.caret-icon.is-open {
+		transform: rotate(180deg);
+	}
+
+	.dmg-notice-strip {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		margin-top: 8px;
+		padding: 7px 14px;
+		font-size: 12px;
+		color: var(--ink-2);
+		background: var(--bg-card);
+		border: 1px dashed var(--line);
+		border-radius: var(--r-sm);
+	}
+
+	.notice-bullet {
+		font-size: 13px;
+	}
+
+	.notice-text {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		flex-wrap: wrap;
+	}
+
+	.notice-link-btn {
+		background: none;
+		border: none;
+		padding: 0;
+		color: var(--amber-hover);
+		font-weight: 600;
+		text-decoration: underline;
+		cursor: pointer;
+		font-size: inherit;
+		font-family: inherit;
+	}
+
+	.notice-link-btn:hover {
+		color: var(--amber);
+	}
+
+	/* Gatekeeper Guide Card */
+	.gatekeeper-guide-card {
+		margin-top: 12px;
+		padding: 16px 20px;
+		background: var(--bg-card);
+		border: 1px solid var(--amber-border);
+		border-radius: var(--r-md);
+		box-shadow: var(--shadow-md);
+		position: relative;
+		animation: fadeInSlide 0.25s var(--ease);
+	}
+
+	@keyframes fadeInSlide {
+		from { opacity: 0; transform: translateY(-6px); }
+		to { opacity: 1; transform: translateY(0); }
+	}
+
+	.guide-header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		margin-bottom: 12px;
+		gap: 12px;
+	}
+
+	.guide-title-wrap {
+		display: flex;
+		align-items: flex-start;
+		gap: 10px;
+	}
+
+	.guide-shield-icon {
+		font-size: 20px;
+		line-height: 1;
+	}
+
+	.guide-title {
+		font-size: 14.5px;
+		font-weight: 700;
+		color: var(--ink);
+		margin: 0;
+	}
+
+	.guide-subtitle {
+		font-size: 12px;
+		color: var(--ink-3);
+		margin: 2px 0 0;
+	}
+
+	.guide-close-btn {
+		background: transparent;
+		border: none;
+		font-size: 20px;
+		line-height: 1;
+		color: var(--ink-3);
+		cursor: pointer;
+		padding: 2px 6px;
+		border-radius: var(--r-xs);
+		transition: color 0.15s ease, background 0.15s ease;
+	}
+
+	.guide-close-btn:hover {
+		color: var(--ink);
+		background: var(--bg-subtle);
+	}
+
+	.guide-steps-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+		gap: 12px;
+		margin: 14px 0;
+	}
+
+	.guide-step-card {
+		padding: 12px 14px;
+		background: var(--bg-subtle);
+		border: 1px solid var(--line-subtle);
+		border-radius: var(--r-sm);
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.guide-step-card.is-highlighted {
+		border-color: var(--amber);
+		background: var(--amber-bg);
+	}
+
+	.step-badge {
+		font-family: var(--mono);
+		font-size: 10px;
+		font-weight: 700;
+		color: var(--amber-hover);
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+	}
+
+	.step-action {
+		font-size: 12.5px;
+		font-weight: 700;
+		color: var(--ink);
+		margin: 0;
+	}
+
+	.step-desc {
+		font-size: 11.5px;
+		color: var(--ink-2);
+		margin: 0;
+		line-height: 1.45;
+	}
+
+	.step-desc code {
+		font-family: var(--mono);
+		font-size: 10.5px;
+		background: rgba(0, 0, 0, 0.06);
+		padding: 1px 4px;
+		border-radius: 3px;
+	}
+
+	.guide-homebrew-tip {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 8px 12px;
+		background: var(--bg-card-alt);
+		border-radius: var(--r-xs);
+		font-size: 12px;
+		color: var(--ink-2);
+	}
+
+	.tip-icon {
+		font-size: 14px;
 	}
 
 	.badge-wrapper :global(.ui-badge) {
@@ -604,6 +1076,30 @@
 
 	.dot-sep {
 		opacity: 0.4;
+	}
+
+	.hero-specs-coffee {
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+		color: var(--amber-hover);
+		text-decoration: none;
+		font-weight: 600;
+		transition: color 0.15s ease, transform 0.15s ease;
+	}
+
+	.hero-specs-coffee:hover {
+		color: var(--amber-deep);
+		transform: translateY(-1px);
+	}
+
+	.hero-specs-coffee .coffee-arrow {
+		font-size: 10px;
+		transition: transform 0.15s ease;
+	}
+
+	.hero-specs-coffee:hover .coffee-arrow {
+		transform: translate(1px, -1px);
 	}
 
 	/* Minimal Metrics Strip */

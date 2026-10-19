@@ -31,6 +31,10 @@
 		{
 			question: 'Can viewers watch on mobile devices or PCs without an app?',
 			answer: 'Yes. Click "Show QR Code" in the menu bar. Anyone on your local Wi-Fi can scan the code to watch the live stream in Safari, Chrome, or Edge without downloading an app.'
+		},
+		{
+			question: 'Why does macOS say "cannot be opened because Apple cannot check it for malicious software"?',
+			answer: 'ezku.link is a free and open-source utility that is not signed with an annual $99 Apple Developer certificate. On first launch of the direct .dmg download, macOS Gatekeeper blocks unidentified developers by default. To open it: Right-click (or Control-click) ezku.link.app in your Applications folder and select "Open", or go to System Settings → Privacy & Security and click "Open Anyway". Alternatively, installing via Homebrew automatically handles this.'
 		}
 	];
 
